@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Photography Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+
+<!-- ─── LOGIN ─────────────────────────────────────────────────────────────── -->
+<div id="login-page">
+  <div class="login-bg">
+    <div class="login-orb login-orb-1"></div>
+    <div class="login-orb login-orb-2"></div>
+  </div>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">📷</div>
+      <h1>Admin Panel</h1>
+      <p>Photography Portfolio Manager</p>
+    </div>
+    <div id="login-error" class="login-error"></div>
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" id="username" placeholder="admin" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Mật khẩu</label>
+        <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn-login" id="btn-login">Đăng nhập</button>
+    </form>
+    <a href="/" class="login-back">← Quay về portfolio</a>
+  </div>
+</div>
+
+<!-- ─── ADMIN APP ─────────────────────────────────────────────────────────── -->
+<div id="admin-app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">📷</div>
+      <div>
+        <div class="sidebar-title">Photo Admin</div>
+        <div class="sidebar-subtitle" id="sidebar-username">admin</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Menu</div>
+      <div class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-tab="hero" id="nav-hero">
+        <span class="nav-icon">🌄</span><span>Hình nền</span>
+        <span class="nav-badge" id="hero-count">0</span>
+      </div>
+      <div class="nav-item" data-tab="photos" id="nav-photos">
+        <span class="nav-icon">🖼️</span><span>Ảnh</span>
+        <span class="nav-badge" id="photos-count">0</span>
+      </div>
+      <div class="nav-item" data-tab="about" id="nav-about">
+        <span class="nav-icon">👤</span><span>About</span>
+      </div>
+      <div class="nav-item" data-tab="services" id="nav-services">
+        <span class="nav-icon">💼</span><span>Dịch vụ</span>
+        <span class="nav-badge" id="services-count">0</span>
+      </div>
+      <div class="sidebar-section-label">Cài đặt</div>
+      <div class="nav-item" data-tab="settings" id="nav-settings">
+        <span class="nav-icon">🔐</span><span>Đổi mật khẩu</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar-initials">A</div>
+        <div>
+          <div class="user-name" id="footer-username">admin</div>
+          <div class="user-role">Photographer</div>
+        </div>
+      </div>
+      <button class="btn-logout" id="btn-logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Đăng xuất
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <div class="topbar-actions">
+        <a href="/" target="_blank" class="btn btn-secondary btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Xem site
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="tab-dashboard" class="tab-panel active">
+        <div class="dashboard-stats">
+          <div class="dash-stat">
+            <div class="dash-stat-icon icon-purple">🖼️</div>
+            <div><div class="dash-stat-num" id="stat-total">0</div><div class="dash-stat-label">Tổng số ảnh</div></div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-icon icon-green">✅</div>
+            <div><div class="dash-stat-num" id="stat-visible">0</div><div class="dash-stat-label">Đang hiển thị</div></div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-icon icon-pink">⭐</div>
+            <div><div class="dash-stat-num" id="stat-featured">0</div><div class="dash-stat-label">Featured</div></div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-icon icon-cyan">💼</div>
+            <div><div class="dash-stat-num" id="stat-services">0</div><div class="dash-stat-label">Dịch vụ</div></div>
+          </div>
+        </div>
+        <!-- Category breakdown -->
+        <div class="table-wrap" style="padding:1.5rem;">
+          <div class="panel-title" style="margin-bottom:1rem;">Phân loại theo thể loại</div>
+          <div id="cat-breakdown" style="display:flex;gap:1rem;flex-wrap:wrap;"></div>
+        </div>
+      </div>
+
+      <!-- ── HERO IMAGES ── -->
+      <div id="tab-hero" class="tab-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Quản lý Hình nền (Background)</div>
+            <div class="panel-subtitle">Quản lý danh sách ảnh hiển thị ở khu vực Hero Banner trên Trang chủ</div>
+          </div>
+        </div>
+        
+        <div class="table-wrap" style="padding:1.5rem; margin-bottom: 2rem;">
+          <div class="form-row">
+            <label class="form-label-admin">Upload hình nền mới</label>
+            <div class="upload-zone" id="hero-upload-zone">
+              <div class="upload-zone-icon">🌄</div>
+              <p><strong>Click hoặc kéo thả</strong> ảnh để upload</p>
+              <p>Khuyến nghị kích thước ngang (1920x1080px), định dạng JPG/WEBP — Tối đa 20MB</p>
+              <input type="file" id="hero-files" accept="image/*" multiple />
+              <div class="upload-progress"><div class="upload-progress-bar" id="hero-upload-progress" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="admin-hero-grid" class="admin-photo-grid">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- ── PHOTOS ── -->
+      <div id="tab-photos" class="tab-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Quản lý ảnh</div>
+            <div class="panel-subtitle">Thêm, sửa, xóa và upload ảnh cho từng thể loại</div>
+          </div>
+          <div style="display:flex;gap:.5rem;align-items:center;">
+            <!-- Filter tabs in admin -->
+            <select class="admin-cat-filter" id="admin-cat-filter">
+              <option value="All">Tất cả</option>
+              <option value="Wedding">💍 Wedding</option>
+              <option value="Portrait">🎭 Portrait</option>
+              <option value="Event">🎊 Event</option>
+              <option value="Product">📦 Product</option>
+            </select>
+            <button class="btn btn-primary" id="btn-add-photo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Thêm ảnh
+            </button>
+          </div>
+        </div>
+        <!-- Photo grid view -->
+        <div id="admin-photo-grid" class="admin-photo-grid">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- ── ABOUT ── -->
+      <div id="tab-about" class="tab-panel">
+        <div class="panel-header">
+          <div><div class="panel-title">Thông tin cá nhân</div><div class="panel-subtitle">Cập nhật profile nhiếp ảnh gia</div></div>
+          <button class="btn btn-primary" id="btn-save-about">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Lưu thay đổi
+          </button>
+        </div>
+        <div class="table-wrap" style="padding:1.5rem;">
+          <form id="about-form">
+            <div class="form-row-2">
+              <div>
+                <label class="form-label-admin">Họ tên <span class="required">*</span></label>
+                <input class="form-control" type="text" id="about-name" placeholder="Nguyễn Văn A" />
+              </div>
+              <div>
+                <label class="form-label-admin">Chức danh <span class="required">*</span></label>
+                <input class="form-control" type="text" id="about-title" placeholder="Professional Photographer" />
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label-admin">Giới thiệu</label>
+              <textarea class="form-control" id="about-bio" rows="4" placeholder="Mô tả về bản thân và phong cách chụp ảnh..."></textarea>
+            </div>
+            <div class="form-row">
+              <label class="form-label-admin">Ảnh đại diện / Portrait</label>
+              <div class="upload-zone" id="about-avatar-zone">
+                <div class="upload-zone-icon">🖼️</div>
+                <p><strong>Click hoặc kéo thả</strong> để upload ảnh chân dung</p>
+                <p>PNG, JPG, WEBP — Tối đa 20MB</p>
+                <input type="file" id="about-avatar-file" accept="image/*" />
+                <div class="upload-progress"><div class="upload-progress-bar" id="about-avatar-progress" style="width:0%"></div></div>
+              </div>
+              <div class="upload-preview" id="about-avatar-preview">
+                <img id="about-avatar-preview-img" src="" alt="Preview" />
+                <button type="button" class="upload-preview-remove" id="about-avatar-remove">✕</button>
+              </div>
+              <input type="hidden" id="about-avatar-url" />
+            </div>
+            <div class="form-row-2">
+              <div>
+                <label class="form-label-admin">Email</label>
+                <input class="form-control" type="email" id="about-email" placeholder="contact@example.com" />
+              </div>
+              <div>
+                <label class="form-label-admin">Số điện thoại</label>
+                <input class="form-control" type="tel" id="about-phone" placeholder="0901 234 567" />
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div>
+                <label class="form-label-admin">Instagram URL</label>
+                <input class="form-control" type="url" id="about-instagram" placeholder="https://instagram.com/..." />
+              </div>
+              <div>
+                <label class="form-label-admin">Facebook URL</label>
+                <input class="form-control" type="url" id="about-facebook" placeholder="https://facebook.com/..." />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── SERVICES ── -->
+      <div id="tab-services" class="tab-panel">
+        <div class="panel-header">
+          <div><div class="panel-title">Dịch vụ</div><div class="panel-subtitle">Quản lý các dịch vụ nhiếp ảnh</div></div>
+          <button class="btn btn-primary" id="btn-add-service">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Thêm dịch vụ
+          </button>
+        </div>
+        <div id="services-admin-grid" class="skills-admin-grid">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div id="tab-settings" class="tab-panel">
+        <div class="panel-header"><div><div class="panel-title">Đổi mật khẩu</div></div></div>
+        <div class="table-wrap" style="padding:1.5rem;max-width:480px;">
+          <form id="change-password-form">
+            <div class="form-row"><label class="form-label-admin">Mật khẩu hiện tại</label><input class="form-control" type="password" id="curr-pw" required /></div>
+            <div class="form-row"><label class="form-label-admin">Mật khẩu mới</label><input class="form-control" type="password" id="new-pw" required /></div>
+            <div class="form-row"><label class="form-label-admin">Xác nhận mật khẩu mới</label><input class="form-control" type="password" id="confirm-pw" required /></div>
+            <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ─── PHOTO MODAL ───────────────────────────────────────────────────────── -->
+<div class="modal-overlay-admin" id="photo-modal-overlay">
+  <div class="modal-dialog" style="max-width:640px;" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 id="photo-modal-heading">Thêm ảnh</h3>
+      <button class="modal-close-btn" id="photo-modal-close">✕</button>
+    </div>
+    <div class="modal-body-admin">
+      <input type="hidden" id="photo-edit-id" />
+      <div class="form-row">
+        <label class="form-label-admin">Tiêu đề <span class="required">*</span></label>
+        <input class="form-control" type="text" id="p-title" placeholder="Tên bộ ảnh..." />
+      </div>
+      <div class="form-row">
+        <label class="form-label-admin">Mô tả</label>
+        <textarea class="form-control" id="p-desc" rows="2" placeholder="Mô tả ngắn..."></textarea>
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label class="form-label-admin">Thể loại <span class="required">*</span></label>
+          <select class="form-control" id="p-category">
+            <option value="Wedding">💍 Wedding</option>
+            <option value="Portrait">🎭 Portrait</option>
+            <option value="Event">🎊 Event</option>
+            <option value="Product">📦 Product</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label-admin">Thứ tự hiển thị</label>
+          <input class="form-control" type="number" id="p-order" value="0" min="0" />
+        </div>
+      </div>
+      <!-- Upload zone -->
+      <div class="form-row">
+        <label class="form-label-admin">Upload ảnh <span class="required">*</span></label>
+        <div class="upload-zone" id="photo-upload-zone">
+          <div class="upload-zone-icon">📸</div>
+          <p><strong>Click hoặc kéo thả</strong> để upload ảnh</p>
+          <p>JPG, PNG, WEBP — Tối đa 20MB (khuyến nghị độ phân giải cao)</p>
+          <input type="file" id="photo-file" accept="image/*" />
+          <div class="upload-progress"><div class="upload-progress-bar" id="photo-upload-progress" style="width:0%"></div></div>
+        </div>
+        <div class="upload-preview" id="photo-preview">
+          <img id="photo-preview-img" src="" alt="Preview" />
+          <button type="button" class="upload-preview-remove" id="photo-preview-remove">✕</button>
+        </div>
+        <input type="hidden" id="p-image-url" />
+        <div style="margin-top:.5rem;">
+          <label class="form-label-admin">Hoặc nhập URL ảnh</label>
+          <input class="form-control" type="url" id="p-image-url-input" placeholder="https://..." />
+        </div>
+      </div>
+
+      <!-- Detail Images Upload zone -->
+      <div class="form-row">
+        <label class="form-label-admin">Hình ảnh chi tiết (Nhiều ảnh, tùy chọn)</label>
+        <div class="upload-zone" id="detail-upload-zone">
+          <div class="upload-zone-icon">🖼️</div>
+          <p><strong>Click hoặc kéo thả</strong> để upload nhiều ảnh chi tiết cho album</p>
+          <input type="file" id="detail-files" accept="image/*" multiple />
+          <div class="upload-progress"><div class="upload-progress-bar" id="detail-upload-progress" style="width:0%"></div></div>
+        </div>
+        <div class="detail-images-preview" id="detail-preview-container" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+          <!-- Detail images thumbnails go here -->
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label class="form-label-admin">Địa điểm</label>
+          <input class="form-control" type="text" id="p-location" placeholder="TP.HCM, Đà Lạt..." />
+        </div>
+        <div>
+          <label class="form-label-admin">Ngày chụp</label>
+          <input class="form-control" type="date" id="p-date" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label-admin">Tags (cách nhau bởi dấu phẩy)</label>
+        <input class="form-control" type="text" id="p-tags" placeholder="outdoor, golden hour, romantic..." />
+      </div>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:.75rem;">
+        <label class="checkbox-row"><input type="checkbox" id="p-visible" checked /> Hiển thị trên gallery</label>
+        <label class="checkbox-row"><input type="checkbox" id="p-featured" /> Featured (hiện ở trang chủ ⭐)</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="photo-cancel-btn">Hủy</button>
+      <button class="btn btn-primary" id="photo-save-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+        Lưu ảnh
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SERVICE MODAL ─────────────────────────────────────────────────────── -->
+<div class="modal-overlay-admin" id="service-modal-overlay">
+  <div class="modal-dialog" style="max-width:480px;" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 id="service-modal-heading">Thêm dịch vụ</h3>
+      <button class="modal-close-btn" id="service-modal-close">✕</button>
+    </div>
+    <div class="modal-body-admin">
+      <input type="hidden" id="service-edit-id" />
+      <div class="form-row-2">
+        <div>
+          <label class="form-label-admin">Tên dịch vụ <span class="required">*</span></label>
+          <input class="form-control" type="text" id="s-name" placeholder="Wedding, Portrait..." />
+        </div>
+        <div>
+          <label class="form-label-admin">Icon (emoji)</label>
+          <input class="form-control" type="text" id="s-icon" placeholder="💍" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label-admin">Mô tả</label>
+        <textarea class="form-control" id="s-desc" rows="3" placeholder="Mô tả về dịch vụ này..."></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-label-admin">Thứ tự</label>
+        <input class="form-control" type="number" id="s-order" value="0" min="0" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="service-cancel-btn">Hủy</button>
+      <button class="btn btn-primary" id="service-save-btn">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONFIRM MODAL ─────────────────────────────────────────────────────── -->
+<div class="modal-overlay-admin" id="confirm-modal-overlay">
+  <div class="modal-dialog" style="max-width:400px;" role="alertdialog" aria-modal="true">
+    <div class="modal-header"><h3>Xác nhận xóa</h3><button class="modal-close-btn" id="confirm-modal-close">✕</button></div>
+    <div class="modal-body-admin"><p style="color:var(--text-secondary);font-size:.9rem;" id="confirm-modal-msg">Bạn có chắc chắn muốn xóa?</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="confirm-cancel-btn">Hủy</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">🗑️ Xóa</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

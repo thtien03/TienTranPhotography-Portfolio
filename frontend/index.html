@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TienTranPhotography — Visual Stories</title>
+  <meta name="description" content="TienTranPhotography — Wedding, Portrait, Event & Product Photography." />
+  
+  <!-- Open Graph / Meta -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="TienTranPhotography — Visual Stories" />
+  <meta property="og:description" content="Wedding, Portrait, Event & Product Photography. Capturing life's most meaningful moments." />
+  <meta property="og:image" content="/uploads/og-image.jpg" />
+
+  <!-- Favicon / SEO -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+
+  <!-- Preload Banner Script -->
+  <script>
+    fetch('/api/hero').then(res => res.json()).then(data => {
+      if (data && data[0] && data[0].image_url) {
+        const link = document.createElement('link');
+        link.rel = 'preload'; link.as = 'image'; link.href = data[0].image_url;
+        document.head.appendChild(link);
+      }
+    }).catch(()=>{});
+  </script>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TienTranPhotography — Visual Stories" />
+  <meta name="twitter:description" content="Wedding, Portrait, Event & Product Photography." />
+  <meta name="twitter:image" content="/uploads/og-image.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css?v=6" />
+</head>
+
+<body>
+
+  <!-- ─── Loader ────────────────────────────────────────────────────── -->
+  <div id="page-loader">
+    <div class="loader-inner">
+      <div class="loader-shutter">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <p class="loader-text">Loading...</p>
+    </div>
+  </div>
+
+  <!-- ─── Cursor ────────────────────────────────────────────────────── -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- ─── Navigation ────────────────────────────────────────────────── -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo" id="nav-logo-name">
+        <img src="/uploads/LOGOden.png?v=2" alt="TienTranPhotography Logo" class="nav-logo-img" />
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#gallery" class="nav-link">Gallery</a></li>
+        <li><a href="#services" class="nav-link">Services</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ──────────────────────────────────────────────────────── -->
+  <section id="home" class="hero">
+    <div class="hero-slides" id="hero-slides">
+      <!-- slides injected by JS -->
+      <div class="hero-slide hero-slide-fallback active">
+        <div class="hero-slide-overlay"></div>
+      </div>
+    </div>
+    <div class="hero-content">
+      <p class="hero-eyebrow reveal-up">Visual Stories — Est. 2020</p>
+      <h1 class="hero-name reveal-up" id="hero-name">Tiến Trần</h1>
+      <p class="hero-tagline reveal-up" id="hero-tagline">
+        <em>Capturing life's most beautiful moments</em>
+      </p>
+      <div class="hero-cats reveal-up">
+        <span>Wedding</span>
+        <span class="dot">·</span>
+        <span>Portrait</span>
+        <span class="dot">·</span>
+        <span>Event</span>
+        <span class="dot">·</span>
+        <span>Product</span>
+      </div>
+      <div class="hero-actions reveal-up">
+        <a href="#gallery" class="btn-hero-primary">View Gallery</a>
+        <a href="#contact" class="btn-hero-outline">Book a Session</a>
+      </div>
+    </div>
+    <div class="hero-scroll-indicator">
+      <span class="scroll-line"></span>
+      <span class="scroll-label">Scroll</span>
+    </div>
+    <!-- Slide nav dots -->
+    <div class="slide-dots" id="slide-dots"></div>
+  </section>
+
+  <!-- ─── GALLERY ───────────────────────────────────────────────────── -->
+  <section id="gallery" class="section gallery-section">
+    <div class="section-container">
+      <div class="section-head">
+        <span class="section-label">Portfolio</span>
+        <h2 class="section-title">Gallery</h2>
+        <p class="section-desc">Những khoảnh khắc được ghi lại qua ống kính</p>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar" id="filter-bar" role="tablist">
+        <button class="filter-btn active" data-filter="All" role="tab" aria-selected="true">All</button>
+        <button class="filter-btn" data-filter="Wedding" role="tab">Wedding</button>
+        <button class="filter-btn" data-filter="Portrait" role="tab">Portrait</button>
+        <button class="filter-btn" data-filter="Event" role="tab">Event</button>
+        <button class="filter-btn" data-filter="Product" role="tab">Product</button>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div id="gallery-grid" class="gallery-grid">
+        <div class="gallery-loading">
+          <div class="shutter-anim">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-load-more" id="load-more-wrap" style="display:none;">
+        <button class="btn-load-more" id="btn-load-more">Xem thêm</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SERVICES ──────────────────────────────────────────────────── -->
+  <section id="services" class="section services-section">
+    <div class="section-container">
+      <div class="section-head">
+        <span class="section-label">What I Do</span>
+        <h2 class="section-title">Dịch vụ</h2>
+      </div>
+      <div id="services-grid" class="services-grid">
+        <!-- injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ABOUT ─────────────────────────────────────────────────────── -->
+  <section id="about" class="section about-section">
+    <div class="section-container">
+      <div class="about-grid">
+        <div class="about-portrait reveal-left">
+          <div class="about-portrait-inner" id="about-portrait-wrap">
+            <img id="about-portrait-img" src="" alt="Photographer portrait" />
+            <div class="about-portrait-placeholder" id="about-portrait-ph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+            </div>
+          </div>
+          <div class="about-exp-badge">
+            <span class="exp-num" id="exp-years">5+</span>
+            <span class="exp-label">Years of<br />Experience</span>
+          </div>
+        </div>
+        <div class="about-content reveal-right">
+          <span class="section-label">About Me</span>
+          <h2 class="about-title" id="about-name-display">Tiến Trần</h2>
+          <p class="about-subtitle" id="about-title-display">Professional Photographer</p>
+          <p class="about-bio" id="about-bio-display">Đang tải...</p>
+          <div class="about-stats">
+            <div class="stat">
+              <span class="stat-num" id="stat-photos">0</span>
+              <span class="stat-lbl">Bộ ảnh</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">500+</span>
+              <span class="stat-lbl">Khách hàng</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">8</span>
+              <span class="stat-lbl">Giải thưởng</span>
+            </div>
+          </div>
+          <div class="about-socials" id="about-socials">
+            <a href="#" id="about-insta" class="social-pill" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+              Instagram
+            </a>
+            <a href="#" id="about-fb" class="social-pill" target="_blank">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                <path
+                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+              Facebook
+            </a>
+            <a href="mailto:" id="about-email" class="social-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              Email
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CONTACT ───────────────────────────────────────────────────── -->
+  <section id="contact" class="section contact-section">
+    <div class="contact-overlay"></div>
+    <div class="section-container contact-inner">
+      <div class="section-head light">
+        <span class="section-label">Get In Touch</span>
+        <h2 class="section-title">Đặt lịch chụp</h2>
+        <p class="section-desc">Hãy liên hệ để chúng ta cùng tạo ra những khoảnh khắc đẹp nhất</p>
+      </div>
+      <div class="contact-cards">
+        <a href="#" id="c-phone" class="contact-card">
+          <div class="cc-icon">📞</div>
+          <div class="cc-label">Điện thoại</div>
+          <div class="cc-val" id="c-phone-val">0901 234 567</div>
+        </a>
+        <a href="#" id="c-email" class="contact-card">
+          <div class="cc-icon">✉️</div>
+          <div class="cc-label">Email</div>
+          <div class="cc-val" id="c-email-val">contact@photographer.com</div>
+        </a>
+        <a href="#" id="c-insta" class="contact-card" target="_blank">
+          <div class="cc-icon">📸</div>
+          <div class="cc-label">Instagram</div>
+          <div class="cc-val">Theo dõi ngay</div>
+        </a>
+        <a href="#" id="c-fb" class="contact-card" target="_blank">
+          <div class="cc-icon">👤</div>
+          <div class="cc-label">Facebook</div>
+          <div class="cc-val">Kết nối ngay</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── COMPACT FOOTER ────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <h3 class="footer-brand" id="footer-name">TienTranPhotography</h3>
+        <p class="footer-copy">© <span id="footer-year"></span> All Rights Reserved</p>
+      </div>
+      <div class="footer-links">
+        <a href="#hero">Trang Chủ</a>
+        <a href="#gallery">Thư Viện Ảnh</a>
+        <a href="#services">Dịch Vụ</a>
+        <a href="#about">Về Tôi</a>
+      </div>
+      <div class="footer-socials">
+        <a href="#" id="f-insta" target="_blank">Instagram</a>
+        <a href="#" id="f-fb" target="_blank">Facebook</a>
+        <a href="#" id="f-email">Email</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── PROJECT DETAIL MODAL ──────────────────────────────────────── -->
+  <div id="project-modal" class="project-modal" role="dialog" aria-modal="true">
+    <button class="pm-close" id="pm-close" aria-label="Close Project">✕</button>
+    <div class="pm-content">
+      <div class="pm-header">
+        <div class="pm-category" id="pm-category">Category</div>
+        <h2 class="pm-title" id="pm-title">Project Title</h2>
+        <p class="pm-desc" id="pm-desc">Project Description</p>
+        <div class="pm-meta" id="pm-meta">Location • Date</div>
+      </div>
+      <div class="pm-masonry" id="pm-masonry">
+        <!-- Main image and detail images will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── LIGHTBOX ──────────────────────────────────────────────────── -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
+    <button class="lb-nav lb-prev" id="lb-prev" aria-label="Previous">‹</button>
+    <button class="lb-nav lb-next" id="lb-next" aria-label="Next">›</button>
+    <div class="lb-counter" id="lb-counter">1 / 12</div>
+    <div class="lb-stage">
+      <img id="lb-img" src="" alt="" />
+      <div class="lb-loader">
+        <div class="lb-spinner"></div>
+      </div>
+    </div>
+    <div class="lb-info">
+      <div class="lb-category" id="lb-category"></div>
+      <h3 class="lb-title" id="lb-title"></h3>
+      <p class="lb-desc" id="lb-desc"></p>
+      <div class="lb-meta" id="lb-meta"></div>
+    </div>
+  </div>
+  <div class="lb-backdrop" id="lb-backdrop"></div>
+
+  <script src="/js/main.js?v=3"></script>
+</body>
+
+</html>
