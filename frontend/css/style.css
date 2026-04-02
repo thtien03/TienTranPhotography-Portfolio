@@ -344,6 +344,36 @@ body.cursor-hover #cursor-ring {
 
 
 
+.btn-client-nav {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--grey-300);
+  color: var(--grey-500);
+  border-radius: 50%;
+  transition: all var(--dur-fast);
+  flex-shrink: 0;
+}
+
+.btn-client-nav:hover {
+  border-color: var(--black);
+  color: var(--black);
+  background: rgba(0,0,0,.04);
+}
+
+.navbar:not(.scrolled) .btn-client-nav {
+  border-color: rgba(255,255,255,.3);
+  color: rgba(255,255,255,.7);
+}
+
+.navbar:not(.scrolled) .btn-client-nav:hover {
+  border-color: var(--white);
+  color: var(--white);
+  background: rgba(255,255,255,.08);
+}
+
 .hamburger {
   display: none;
   flex-direction: column;

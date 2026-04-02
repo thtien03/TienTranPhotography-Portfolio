@@ -83,14 +83,61 @@ db.exec(`
     order_index INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS client_albums (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_email TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    drive_folder_id TEXT NOT NULL,
+    cover_image TEXT DEFAULT '',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // ─── Migrations ───────────────────────────────────────────────────────────────
 try {
   db.exec("ALTER TABLE photos ADD COLUMN detail_images TEXT DEFAULT '[]'");
-} catch (e) {
-  // Column already exists, ignore
-}
+} catch (e) { /* Column already exists */ }
+try {
+  db.exec("ALTER TABLE client_albums ADD COLUMN status TEXT DEFAULT 'draft'");
+} catch (e) { /* Column already exists */ }
+try {
+  db.exec("ALTER TABLE client_albums ADD COLUMN client_name TEXT DEFAULT ''");
+} catch (e) { /* Column already exists */ }
+try {
+  db.exec("ALTER TABLE client_albums ADD COLUMN last_selection TEXT DEFAULT ''");
+} catch (e) { /* Column already exists */ }
+try {
+  db.exec("ALTER TABLE client_albums ADD COLUMN is_public INTEGER DEFAULT 0");
+} catch (e) { /* Column already exists */ }
+
+// Access requests table
+db.exec(`
+  CREATE TABLE IF NOT EXISTS access_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    album_id INTEGER NOT NULL,
+    email TEXT NOT NULL,
+    name TEXT DEFAULT '',
+    status TEXT DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+// Unified admin notifications table
+db.exec(`
+  CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL,
+    album_id INTEGER,
+    album_title TEXT DEFAULT '',
+    email TEXT NOT NULL,
+    name TEXT DEFAULT '',
+    message TEXT DEFAULT '',
+    is_read INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
 
 // ─── Seed ─────────────────────────────────────────────────────────────────────
 function seedData() {

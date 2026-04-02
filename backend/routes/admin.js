@@ -296,4 +296,221 @@ router.put('/hero/reorder', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ─── Client Albums (Admin quản lý) ───────────────────────────────────────────
+// Helper: chuẩn hóa danh sách email từ string hoặc array
+function normalizeEmails(raw) {
+  if (!raw) return '';
+  const arr = Array.isArray(raw) ? raw : String(raw).split(',');
+  return arr.map(e => e.trim().toLowerCase()).filter(Boolean).join(',');
+}
+
+router.get('/client-albums', auth, async (req, res) => {
+  try {
+    const albums = await db.allAsync('SELECT * FROM client_albums ORDER BY created_at DESC');
+    res.json(albums.map(a => ({
+      ...a,
+      client_emails: a.client_email ? a.client_email.split(',').filter(Boolean) : []
+    })));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.post('/client-albums', auth, async (req, res) => {
+  try {
+    const { client_emails, client_name, title, description, drive_folder_id, cover_image, status, is_public } = req.body;
+    if (!title || !drive_folder_id) return res.status(400).json({ error: 'title và drive_folder_id là bắt buộc.' });
+    let folderId = drive_folder_id;
+    const match = drive_folder_id.match(/folders\/([a-zA-Z0-9_-]+)/);
+    if (match) folderId = match[1];
+    const emailStr = normalizeEmails(client_emails);
+    const result = await db.runAsync(
+      'INSERT INTO client_albums (client_email, client_name, title, description, drive_folder_id, cover_image, status, is_public) VALUES (?,?,?,?,?,?,?,?)',
+      [emailStr, client_name || '', title, description || '', folderId, cover_image || '', status || 'draft', is_public ? 1 : 0]
+    );
+    const album = await db.getAsync('SELECT * FROM client_albums WHERE id = ?', [result.lastInsertRowid]);
+    res.status(201).json({ ...album, client_emails: album.client_email ? album.client_email.split(',').filter(Boolean) : [] });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.put('/client-albums/:id', auth, async (req, res) => {
+  try {
+    const existing = await db.getAsync('SELECT * FROM client_albums WHERE id = ?', [req.params.id]);
+    if (!existing) return res.status(404).json({ error: 'Album not found.' });
+    const { client_emails, client_name, title, description, drive_folder_id, cover_image, status, is_public } = req.body;
+    let folderId = drive_folder_id || existing.drive_folder_id;
+    const driveMatch = folderId.match(/folders\/([a-zA-Z0-9_-]+)/);
+    if (driveMatch) folderId = driveMatch[1];
+    const emailStr = client_emails !== undefined ? normalizeEmails(client_emails) : existing.client_email;
+    await db.runAsync(
+      'UPDATE client_albums SET client_email=?, client_name=?, title=?, description=?, drive_folder_id=?, cover_image=?, status=?, is_public=? WHERE id=?',
+      [
+        emailStr,
+        client_name !== undefined ? client_name : (existing.client_name || ''),
+        title || existing.title,
+        description !== undefined ? description : existing.description,
+        folderId,
+        cover_image !== undefined ? cover_image : existing.cover_image,
+        status !== undefined ? status : (existing.status || 'draft'),
+        is_public !== undefined ? (is_public ? 1 : 0) : (existing.is_public || 0),
+        req.params.id
+      ]
+    );
+    const updated = await db.getAsync('SELECT * FROM client_albums WHERE id = ?', [req.params.id]);
+    res.json({ ...updated, client_emails: updated.client_email ? updated.client_email.split(',').filter(Boolean) : [] });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.delete('/client-albums/:id', auth, async (req, res) => {
+  try {
+    const existing = await db.getAsync('SELECT * FROM client_albums WHERE id = ?', [req.params.id]);
+    if (!existing) return res.status(404).json({ error: 'Album not found.' });
+    await db.runAsync('DELETE FROM client_albums WHERE id = ?', [req.params.id]);
+    await db.runAsync('DELETE FROM access_requests WHERE album_id = ?', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+const DRIVE_API_KEY = process.env.DRIVE_API_KEY;
+
+router.get('/client-albums/:id/selection', auth, async (req, res) => {
+  try {
+    const album = await db.getAsync('SELECT * FROM client_albums WHERE id = ?', [req.params.id]);
+    if (!album) return res.status(404).json({ error: 'Album not found.' });
+    
+    let selection = null;
+    try { selection = album.last_selection ? JSON.parse(album.last_selection) : null; } catch {}
+
+    let allPhotos = [];
+    if (album.drive_folder_id && DRIVE_API_KEY) {
+      const folderId = album.drive_folder_id;
+      let pageToken = '';
+      do {
+        const driveUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType+contains+'image/'&key=${DRIVE_API_KEY}&fields=nextPageToken,files(id,name,mimeType,thumbnailLink,imageMediaMetadata,createdTime,size)&pageSize=1000${pageToken ? '&pageToken=' + pageToken : ''}`;
+        const fetchResponse = await fetch(driveUrl);
+        if (fetchResponse.ok) {
+          const driveData = await fetchResponse.json();
+          if (driveData.files && driveData.files.length) {
+            allPhotos.push(...driveData.files);
+          }
+          pageToken = driveData.nextPageToken;
+        } else {
+          pageToken = null;
+        }
+      } while (pageToken);
+      
+      // format allPhotos similar to client
+      allPhotos = allPhotos.map(file => {
+        let name = file.name || file.id;
+        const hasExt = /\.(jpg|jpeg|png|gif|webp|heic|raw|tif|tiff)$/i.test(name);
+        if (!hasExt) {
+          const mime = file.mimeType || '';
+          const ext = mime.includes('png') ? '.png' : mime.includes('webp') ? '.webp' :
+                      mime.includes('gif') ? '.gif' : mime.includes('heic') ? '.heic' : '.jpg';
+          name = name + ext;
+        }
+        return {
+          id: file.id,
+          name: name,
+          thumbnail: `https://lh3.googleusercontent.com/d/${file.id}=w800`,
+          url: `https://lh3.googleusercontent.com/d/${file.id}=w3000`,
+          createdTime: file.createdTime || null,
+          size: file.size || null
+        };
+      });
+    }
+
+    res.json({ album, selection, allPhotos });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── Unified Notifications ────────────────────────────────────────────────────
+// Returns all unread notifications (access requests + selections + comments)
+router.get('/notifications', auth, async (req, res) => {
+  try {
+    // 1. Pending access requests
+    const accessRequests = await db.allAsync(`
+      SELECT ar.id, 'access_request' as type,
+             ar.album_id, ca.title as album_title,
+             ar.email, ar.name, '' as message,
+             ar.status, ar.created_at
+      FROM access_requests ar
+      LEFT JOIN client_albums ca ON ca.id = ar.album_id
+      WHERE ar.status = 'pending'
+    `);
+
+    // 2. Unread general notifications (selections, comments)
+    const generalNotifs = await db.allAsync(`
+      SELECT id, type, album_id, album_title, email, name, message,
+             'unread' as status, created_at
+      FROM notifications
+      WHERE is_read = 0
+      ORDER BY created_at DESC
+    `);
+
+    const all = [...accessRequests, ...generalNotifs]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    res.json({ count: all.length, notifications: all });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Mark a general notification as read
+router.put('/notifications/:id/read', auth, async (req, res) => {
+  try {
+    await db.runAsync('UPDATE notifications SET is_read = 1 WHERE id = ?', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Mark ALL notifications as read
+router.post('/notifications/read-all', auth, async (req, res) => {
+  try {
+    await db.runAsync('UPDATE notifications SET is_read = 1');
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ─── Access Request Management ─────────────────────────────────────────────────
+router.get('/access-requests', auth, async (req, res) => {
+  try {
+    const requests = await db.allAsync(`
+      SELECT ar.*, ca.title as album_title
+      FROM access_requests ar
+      LEFT JOIN client_albums ca ON ca.id = ar.album_id
+      ORDER BY ar.created_at DESC
+    `);
+    res.json(requests);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.put('/access-requests/:id', auth, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status. Must be approved or rejected.' });
+    }
+    const request = await db.getAsync('SELECT * FROM access_requests WHERE id = ?', [req.params.id]);
+    if (!request) return res.status(404).json({ error: 'Request not found.' });
+
+    await db.runAsync('UPDATE access_requests SET status = ? WHERE id = ?', [status, req.params.id]);
+
+    if (status === 'approved') {
+      const album = await db.getAsync('SELECT * FROM client_albums WHERE id = ?', [request.album_id]);
+      if (album) {
+        const existing = album.client_email || '';
+        const emails = existing.split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+        const newEmail = request.email.toLowerCase();
+        if (!emails.includes(newEmail)) {
+          emails.push(newEmail);
+          await db.runAsync(
+            'UPDATE client_albums SET client_email = ? WHERE id = ?',
+            [emails.join(','), request.album_id]
+          );
+        }
+      }
+    }
+
+    res.json({ success: true, status });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;

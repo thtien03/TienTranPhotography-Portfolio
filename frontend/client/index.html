@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Portal — TienTranPhotography</title>
+  <meta name="description" content="Xem bộ ảnh của bạn — TienTranPhotography Client Portal" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/client.css" />
+</head>
+<body>
+
+  <!-- ─── Loader ──────────────────────────────────────────────── -->
+  <div id="page-loader">
+    <div class="loader-bars">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- ─── Login Screen ────────────────────────────────────────── -->
+  <div id="login-screen" class="screen hidden">
+    <div class="login-bg"></div>
+    <div class="login-card">
+      <a href="/" class="login-back">← Về trang chủ</a>
+      <div class="login-logo">
+        <img src="/uploads/LOGOden.png?v=2" alt="TienTranPhotography" onerror="this.style.display='none'" />
+      </div>
+      <h1 class="login-title">Client Portal</h1>
+      <p class="login-subtitle">Đăng nhập để xem bộ ảnh của bạn</p>
+      <div class="login-divider"></div>
+
+      <!-- Custom Google Sign-In Button (redirect flow) -->
+      <button id="btn-google-login" class="btn-google-login">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20">
+          <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.7 13.3l7.8 6.1C12.4 13 17.7 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/>
+          <path fill="#FBBC05" d="M10.5 28.6A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.7-4.6l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l7.8-6.1z"/>
+          <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.7 2.3-6.3 0-11.6-3.5-13.5-9.3l-7.8 6.1C6.7 42.6 14.7 48 24 48z"/>
+        </svg>
+        Đăng nhập với Google
+      </button>
+
+      <p class="login-note">Chỉ những địa chỉ email đã được cấp quyền mới có thể xem bộ ảnh của mình.</p>
+    </div>
+  </div>
+
+  <!-- ─── Dashboard Screen ─────────────────────────────────────── -->
+  <div id="dashboard-screen" class="screen hidden">
+    <nav class="client-nav">
+      <a href="/" class="cn-logo">
+        <img src="/uploads/LOGOden.png?v=2" alt="TienTranPhotography" onerror="this.style.display='none'" />
+      </a>
+      <div class="cn-right">
+        <div class="cn-user">
+          <img id="user-avatar" src="" alt="" />
+          <span id="user-name"></span>
+        </div>
+        <button id="btn-logout" class="btn-logout">Đăng xuất</button>
+      </div>
+    </nav>
+
+    <main class="dashboard-main">
+      <div class="dash-header">
+        <span class="dash-label">Bộ Sưu Tập Của Bạn</span>
+        <h2 class="dash-title">Albums</h2>
+        <p class="dash-sub" id="dash-sub">Chào mừng bạn trở lại</p>
+      </div>
+      <div id="albums-grid" class="albums-grid">
+        <div class="albums-loading">
+          <div class="loading-bars"><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div id="albums-empty" class="albums-empty hidden">
+        <div class="empty-icon">📷</div>
+        <h3>Chưa có bộ ảnh nào</h3>
+        <p>Bộ ảnh của bạn sẽ xuất hiện ở đây sau khi nhiếp ảnh gia chia sẻ với bạn.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ─── Album Detail Screen ──────────────────────────────────── -->
+  <div id="album-screen" class="screen hidden">
+    <nav class="client-nav">
+      <button id="btn-back-albums" class="cn-back">← Quay lại Albums</button>
+      <div class="cn-right">
+        <div class="cn-user">
+          <img id="user-avatar-2" src="" alt="" />
+          <span id="user-name-2"></span>
+        </div>
+        <button id="btn-logout-2" class="btn-logout">Đăng xuất</button>
+      </div>
+    </nav>
+    <main class="album-main">
+      <div class="album-header">
+        <span class="dash-label" id="album-date"></span>
+        <h2 class="dash-title" id="album-title">Album</h2>
+        <p class="dash-sub" id="album-desc"></p>
+      </div>
+
+      <!-- Selection filter bar -->
+      <div class="sel-bar" id="sel-bar">
+        <div class="sel-filters" id="sel-filters">
+          <button class="sel-tab active" data-filter="all">🗂️ Tất cả</button>
+          <button class="sel-tab" data-filter="selected">✅ Đã chọn</button>
+          <button class="sel-tab" data-filter="later">⏳ Chọn sau</button>
+          <button class="sel-tab" data-filter="none">❌ Chưa chọn</button>
+        </div>
+        <div class="sel-bar-right">
+          <!-- View toggle -->
+          <div class="view-toggle">
+            <button class="view-btn active" id="btn-view-grid" title="Dạng lưới">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </button>
+            <button class="view-btn" id="btn-view-list" title="Dạng danh sách">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+          </div>
+          <span class="sel-counter" id="sel-counter">Đã chọn: 0 / 0</span>
+          <!-- Download dropdown -->
+          <div class="dl-wrap" id="dl-wrap">
+            <button class="btn-download" id="btn-download" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Tải xuống
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dl-menu hidden" id="dl-menu">
+              <button class="dl-option" id="btn-dl-selected">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+                Tải ảnh đã chọn
+                <span class="dl-count" id="dl-selected-count">(0)</span>
+              </button>
+              <div class="dl-divider"></div>
+              <button class="dl-option" id="btn-dl-all">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Tải toàn bộ album
+                <span class="dl-count" id="dl-all-count">(0)</span>
+              </button>
+            </div>
+          </div>
+          <button class="btn-submit-sel" id="btn-submit-sel" disabled>🚀 Gửi hậu kỳ</button>
+        </div>
+      </div>
+      <div class="sel-info" id="sel-info"></div>
+
+      <!-- Search + Sort toolbar -->
+      <div class="photo-toolbar" id="photo-toolbar">
+        <div class="photo-search-wrap">
+          <svg class="photo-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="photo-search" class="photo-search-input" placeholder="Tìm kiếm tên ảnh..." autocomplete="off" />
+          <button class="photo-search-clear hidden" id="photo-search-clear" title="Xóa">✕</button>
+        </div>
+        <div class="photo-sort-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+          <select id="photo-sort" class="photo-sort-select">
+            <option value="default">Thứ tự gốc</option>
+            <option value="name-asc">Tên A → Z</option>
+            <option value="name-desc">Tên Z → A</option>
+            <option value="time-desc">Mới nhất trước</option>
+            <option value="time-asc">Đưa lên sớm nhất</option>
+          </select>
+        </div>
+        <span class="photo-count-label" id="photo-count-label"></span>
+      </div>
+
+      <div id="photos-grid" class="photos-grid">
+        <div class="albums-loading">
+          <div class="loading-bars"><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <div id="load-more-wrap" class="load-more-wrap hidden">
+        <button id="btn-load-more" class="btn-load-more">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+          Xem thêm ảnh
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- ─── Lightbox ─────────────────────────────────────────────── -->
+  <div id="lightbox" class="lightbox hidden">
+    <button id="lb-close" class="lb-close" aria-label="Đóng">✕</button>
+    <button id="lb-prev" class="lb-nav lb-prev" aria-label="Trước">‹</button>
+    <button id="lb-next" class="lb-nav lb-next" aria-label="Tiếp">›</button>
+    <div class="lb-stage">
+      <img id="lb-img" src="" alt="" />
+      <div class="lb-loader"><div class="lb-spinner"></div></div>
+    </div>
+    <div class="lb-toolbar" id="lb-toolbar">
+      <div class="lb-counter" id="lb-counter">1 / 1</div>
+      <div class="lb-actions">
+        <button id="lb-btn-comment" class="lb-action-btn" title="Ghi chú / Yêu cầu chỉnh sửa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="lba-text">Ghi chú</span>
+        </button>
+        <button id="lb-btn-later" class="lb-action-btn" title="Chọn sau">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="lba-text">Chọn sau</span>
+        </button>
+        <button id="lb-btn-select" class="lb-action-btn" title="Chọn ảnh này">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="lba-text">Chọn ảnh</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="lb-backdrop" class="lb-backdrop hidden"></div>
+
+  <!-- Photo Comment Modal -->
+  <div class="comment-modal" id="comment-modal">
+    <div class="comment-dialog">
+      <div class="comment-dialog-header">
+        <h3>💬 Ghi chú / Yêu cầu chỉnh sửa</h3>
+        <button id="comment-close-btn" class="comment-close-x" title="Đóng">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="comment-photo-preview">
+        <img id="comment-thumb" src="" alt="" />
+        <div class="comment-photo-info">
+          <div id="comment-photo-name" class="comment-photo-name"></div>
+          <div id="comment-photo-state" class="comment-photo-state"></div>
+        </div>
+      </div>
+      <textarea id="comment-input" class="comment-textarea"
+        placeholder="Ví dụ: Làm sáng thêm, crop bớt phần bên phải, xóa vật phẩm góc dưới..." rows="4"></textarea>
+      <div class="comment-hint">Nhấn <kbd>Ctrl</kbd>+<kbd>Enter</kbd> để lưu nhanh</div>
+      <div class="comment-dialog-actions">
+        <button id="comment-close-btn-2" class="btn-portal-sec" onclick="closeCommentModal()">Hủy</button>
+        <button id="comment-save-btn" class="btn-portal-primary">💾 Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Confirm Modal -->
+  <div class="submit-overlay" id="submit-confirm-overlay">
+    <div class="submit-dialog">
+      <div class="submit-dialog-icon">🚀</div>
+      <h3>Xác nhận gửi hậu kỳ</h3>
+      <p>Bạn đã chọn <strong id="submit-count">0</strong> ảnh.<br>Sau khi gửi, nhiếp ảnh gia sẽ xử lý hậu kỳ cho những ảnh này.</p>
+      <div class="submit-dialog-actions">
+        <button id="cancel-submit-btn" class="btn-portal-sec">Hủy</button>
+        <button id="confirm-submit-btn" class="btn-portal-primary">✅ Xác nhận gửi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Success Modal -->
+  <div class="submit-overlay" id="submit-success-overlay">
+    <div class="submit-dialog success">
+      <div class="submit-dialog-icon">🎉</div>
+      <h3>Đã gửi thành công!</h3>
+      <p>Đã gửi <strong id="success-count">0</strong> ảnh cho hậu kỳ.<br>Nhiếp ảnh gia sẽ liên hệ khi hoàn tất.</p>
+      <div class="submit-dialog-actions">
+        <button id="close-success-btn" class="btn-portal-primary">Tuyệt vời! 🙌</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GOOGLE_CLIENT_ID = '114681132415-k6fj0vef6cvltn3n1vsoh6eij77q7lnb.apps.googleusercontent.com';
+    const API_BASE = '/api/client';
+  </script>
+  <!-- JSZip + FileSaver.js: tạo và tải file ZIP chính xác -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="/js/client.js?v=1.2"></script>
+</body>
+</html>

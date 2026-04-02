@@ -43,6 +43,7 @@ app.use('/uploads', express.static(UPLOADS_DIR, staticOptions));
 // ─── API Routes ───────────────────────────────────────────────────────────────
 const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
+const clientRoutes = require('./routes/client');
 
 app.use('/api', apiRoutes);
 app.use('/api/admin/login', rateLimit({
@@ -51,6 +52,7 @@ app.use('/api/admin/login', rateLimit({
   message: { error: 'Đăng nhập sai quá 5 lần. Vui lòng thử lại sau 15 phút để bảo vệ hệ thống.' }
 }));
 app.use('/api/admin', adminRoutes);
+app.use('/api/client', clientRoutes);
 
 // ─── Admin SPA fallback ───────────────────────────────────────────────────────
 app.get('/admin', (req, res) => {
@@ -60,6 +62,16 @@ app.get('/admin', (req, res) => {
 app.get('/admin/*', (req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, 'admin', 'index.html'));
 });
+
+// ─── Client Portal fallback ───────────────────────────────────────────────────
+app.get('/client', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'client', 'index.html'));
+});
+
+app.get('/client/*', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'client', 'index.html'));
+});
+
 
 // ─── Catch-all → Portfolio ─────────────────────────────────────────────────────
 app.get('*', (req, res) => {
