@@ -4,323 +4,465 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Photography Portfolio</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/css/admin.css?v=6.0" />
+  <!-- UI Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              deep: '#080a11',
+              surface: '#111420',
+              primary: '#6366f1',
+              secondary: '#8b5cf6',
+              accent: '#06b6d4',
+            },
+            glass: 'rgba(255, 255, 255, 0.05)',
+          },
+          borderRadius: {
+            'xl': '1rem',
+            '2xl': '1.5rem',
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="/css/admin.css?v=7.0" />
 </head>
-<body>
+<body class="bg-brand-deep text-slate-100 min-h-screen">
 
 <!-- ─── LOGIN ─────────────────────────────────────────────────────────────── -->
-<div id="login-page">
-  <div class="login-bg">
-    <div class="login-orb login-orb-1"></div>
-    <div class="login-orb login-orb-2"></div>
+<div id="login-page" class="fixed inset-0 z-[2000] flex items-center justify-center p-6 overflow-hidden">
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-brand-primary opacity-20 blur-[120px] rounded-full"></div>
+    <div class="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-brand-secondary opacity-20 blur-[120px] rounded-full"></div>
   </div>
-  <div class="login-box">
-    <div class="login-logo">
-      <div class="login-logo-icon">📷</div>
-      <h1>Admin Panel</h1>
-      <p>Photography Portfolio Manager</p>
+  
+  <div class="glass-heavy w-full max-w-md p-10 rounded-2xl shadow-2xl relative z-10 border border-white/10">
+    <div class="text-center mb-10">
+      <div class="w-16 h-16 primary-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-brand-primary/30">
+        <i data-lucide="camera" class="w-8 h-8 text-white"></i>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-gradient">Admin Panel</h1>
+      <p class="text-slate-400 mt-2">Đăng nhập để quản lý Portfolio</p>
     </div>
-    <div id="login-error" class="login-error"></div>
-    <form id="login-form">
-      <div class="form-group">
-        <label class="form-label" for="username">Username</label>
-        <input class="form-input" type="text" id="username" placeholder="admin" autocomplete="username" required />
+
+    <div id="login-error" class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-300 text-sm mb-6 hidden"></div>
+
+    <form id="login-form" class="space-y-5">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2" for="username">Username</label>
+        <div class="relative">
+          <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+          <input class="admin-input pl-11" type="text" id="username" placeholder="admin" autocomplete="username" required />
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="password">Mật khẩu</label>
-        <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" required />
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2" for="password">Mật khẩu</label>
+        <div class="relative">
+          <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+          <input class="admin-input pl-11" type="password" id="password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
       </div>
-      <button type="submit" class="btn-login" id="btn-login">Đăng nhập</button>
+      <button type="submit" class="w-full py-3.5 px-6 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200" id="btn-login">
+        Đăng nhập
+      </button>
     </form>
-    <a href="/" class="login-back">← Quay về portfolio</a>
+    
+    <div class="mt-8 text-center">
+      <a href="/" class="text-sm text-slate-500 hover:text-brand-primary transition-colors flex items-center justify-center gap-2">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại website
+      </a>
+    </div>
   </div>
 </div>
 
 <!-- ─── ADMIN APP ─────────────────────────────────────────────────────────── -->
-<div id="admin-app">
+<div id="admin-app" class="flex min-h-screen">
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">📷</div>
-      <div>
-        <div class="sidebar-title">Photo Admin</div>
-        <div class="sidebar-subtitle" id="sidebar-username">admin</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="sidebar-section-label">Menu</div>
-      <div class="nav-item active" data-tab="dashboard" id="nav-dashboard">
-        <span class="nav-icon">📊</span><span>Dashboard</span>
-      </div>
-      <div class="nav-item" data-tab="hero" id="nav-hero">
-        <span class="nav-icon">🌄</span><span>Hình nền</span>
-        <span class="nav-badge" id="hero-count">0</span>
-      </div>
-      <div class="nav-item" data-tab="photos" id="nav-photos">
-        <span class="nav-icon">🖼️</span><span>Ảnh</span>
-        <span class="nav-badge" id="photos-count">0</span>
-      </div>
-      <div class="nav-item" data-tab="about" id="nav-about">
-        <span class="nav-icon">👤</span><span>About</span>
-      </div>
-      <div class="nav-item" data-tab="services" id="nav-services">
-        <span class="nav-icon">💼</span><span>Dịch vụ</span>
-        <span class="nav-badge" id="services-count">0</span>
-      </div>
-      <div class="nav-item" data-tab="client-albums" id="nav-client-albums">
-        <span class="nav-icon">👥</span><span>Client Albums</span>
-        <span class="nav-badge" id="client-albums-count">0</span>
-      </div>
-      <div class="sidebar-section-label">Cài đặt</div>
-      <div class="nav-item" data-tab="settings" id="nav-settings">
-        <span class="nav-icon">🔐</span><span>Đổi mật khẩu</span>
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-info">
-        <div class="user-avatar" id="user-avatar-initials">A</div>
+  <aside class="sidebar w-64 h-screen glass-heavy border-r border-white/5 flex flex-col fixed left-0 top-0 z-[100] transition-transform duration-300" id="sidebar">
+    <div class="p-6 border-b border-white/5">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 primary-gradient rounded-xl flex items-center justify-center shadow-lg shadow-brand-primary/20">
+          <i data-lucide="aperture" class="w-6 h-6 text-white"></i>
+        </div>
         <div>
-          <div class="user-name" id="footer-username">admin</div>
-          <div class="user-role">Photographer</div>
+          <h2 class="text-sm font-bold tracking-tight">TienTran Photo</h2>
+          <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider" id="sidebar-username">ADMIN</p>
         </div>
       </div>
-      <button class="btn-logout" id="btn-logout">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-        Đăng xuất
+    </div>
+
+    <nav class="flex-1 overflow-y-auto p-4 py-8 space-y-6">
+      <div>
+        <h3 class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Core</h3>
+        <div class="space-y-1">
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group active" data-tab="dashboard" id="nav-dashboard">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Dashboard</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="hero" id="nav-hero">
+            <i data-lucide="image" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Hình nền</span>
+            <span class="ml-auto bg-brand-primary/20 text-brand-primary text-[10px] px-2 py-0.5 rounded-full font-bold" id="hero-count">0</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="photos" id="nav-photos">
+            <i data-lucide="gallery-vertical-end" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Ảnh Gallery</span>
+            <span class="ml-auto bg-brand-primary/20 text-brand-primary text-[10px] px-2 py-0.5 rounded-full font-bold" id="photos-count">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Management</h3>
+        <div class="space-y-1">
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="services" id="nav-services">
+            <i data-lucide="briefcase" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Dịch vụ</span>
+            <span class="ml-auto bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded-full font-bold" id="services-count">0</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="client-albums" id="nav-client-albums">
+            <i data-lucide="users" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Album Khách Hàng</span>
+            <span class="ml-auto bg-brand-primary/20 text-brand-primary text-[10px] px-2 py-0.5 rounded-full font-bold" id="client-albums-count">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Identity</h3>
+        <div class="space-y-1">
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="about" id="nav-about">
+            <i data-lucide="user-circle" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Hồ sơ cá nhân</span>
+          </div>
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="settings" id="nav-settings">
+            <i data-lucide="lock" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Bảo mật</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="p-4 border-t border-white/5">
+      <div class="bg-white/5 rounded-2xl p-4 flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 primary-gradient rounded-full flex items-center justify-center font-bold text-white shadow-lg shadow-brand-primary/20" id="user-avatar-initials">A</div>
+        <div class="flex-1 overflow-hidden">
+          <p class="text-sm font-bold truncate" id="footer-username">Admin</p>
+          <p class="text-[11px] text-slate-500">Photographer</p>
+        </div>
+      </div>
+      <button class="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-bold text-sm" id="btn-logout">
+        <i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất
       </button>
     </div>
   </aside>
 
-  <main class="main-content">
-    <header class="topbar">
-      <button class="menu-toggle" id="menu-toggle" aria-label="Toggle sidebar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-      <span class="topbar-title" id="topbar-title">Dashboard</span>
-      <div class="topbar-actions">
-        <!-- Notification Bell -->
-        <div class="notif-wrap" id="notif-wrap">
-          <button class="notif-bell" id="notif-bell" title="Thông báo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            <span class="notif-badge hidden" id="notif-badge">0</span>
+  <main class="flex-1 ml-0 md:ml-64 transition-all flex flex-col min-h-screen">
+    <header class="h-16 px-6 glass border-b border-white/5 flex items-center justify-between sticky top-0 z-50">
+      <div class="flex items-center gap-4">
+        <button class="md:hidden p-2 rounded-lg hover:bg-white/5 text-slate-400" id="menu-toggle">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 class="text-lg font-bold text-gradient" id="topbar-title">Dashboard</h1>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <!-- Notifications -->
+        <div class="relative" id="notif-wrap">
+          <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400 relative" id="notif-bell">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span class="absolute top-2 right-2 w-2 h-2 bg-brand-primary rounded-full hidden border-2 border-brand-deep" id="notif-badge"></span>
           </button>
-          <!-- Notifications Dropdown -->
-          <div class="notif-dropdown hidden" id="notif-dropdown">
-            <div class="notif-header">
-              <span>🔔 Thông báo</span>
-              <button class="notif-mark-all" id="notif-close" type="button" title="Đóng">✕</button>
+          
+          <!-- Dropdown -->
+          <div class="absolute right-0 mt-3 w-80 glass-heavy rounded-2xl shadow-2xl border border-white/10 hidden overflow-hidden scale-95 opacity-0 origin-top-right transition-all duration-200" id="notif-dropdown">
+            <div class="p-4 bg-white/5 flex items-center justify-between border-b border-white/5">
+              <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Thông báo mới</span>
+              <button class="p-1 hover:text-white transition-colors" id="notif-close"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="notif-list" id="notif-list">
-              <div class="notif-empty">Không có yêu cầu mới</div>
+            <div class="max-h-96 overflow-y-auto" id="notif-list">
+              <div class="p-10 text-center text-slate-500 text-sm">Không có thông báo mới</div>
             </div>
           </div>
         </div>
-        <a href="/" target="_blank" class="btn btn-secondary btn-sm">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Xem site
+
+        <div class="h-8 w-px bg-white/10 mx-2"></div>
+
+        <a href="/" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-xs font-bold transition-all">
+          <i data-lucide="external-link" class="w-4 h-4"></i> Xem Website
         </a>
       </div>
     </header>
 
-    <div class="page-content">
+    <div class="page-content p-6 md:p-10 space-y-10">
 
       <!-- ── DASHBOARD ── -->
-      <div id="tab-dashboard" class="tab-panel active">
-        <div class="dashboard-stats">
-          <div class="dash-stat">
-            <div class="dash-stat-icon icon-purple">🖼️</div>
-            <div><div class="dash-stat-num" id="stat-total">0</div><div class="dash-stat-label">Tổng số ảnh</div></div>
+      <div id="tab-dashboard" class="tab-panel active space-y-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="glass-card stat-grad-1 p-8 rounded-2xl flex items-center gap-6">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-indigo-500/20 text-indigo-400">
+              <i data-lucide="image" class="w-7 h-7"></i>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold tracking-tight" id="stat-total">0</div>
+              <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Tổng số ảnh</div>
+            </div>
           </div>
-          <div class="dash-stat">
-            <div class="dash-stat-icon icon-green">✅</div>
-            <div><div class="dash-stat-num" id="stat-visible">0</div><div class="dash-stat-label">Đang hiển thị</div></div>
+          <div class="glass-card stat-grad-2 p-8 rounded-2xl flex items-center gap-6">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-green-500/20 text-green-400">
+              <i data-lucide="eye" class="w-7 h-7"></i>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold tracking-tight" id="stat-visible">0</div>
+              <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Đang hiển thị</div>
+            </div>
           </div>
-          <div class="dash-stat">
-            <div class="dash-stat-icon icon-pink">⭐</div>
-            <div><div class="dash-stat-num" id="stat-featured">0</div><div class="dash-stat-label">Featured</div></div>
+          <div class="glass-card stat-grad-3 p-8 rounded-2xl flex items-center gap-6">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-amber-500/20 text-amber-400">
+              <i data-lucide="star" class="w-7 h-7"></i>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold tracking-tight" id="stat-featured">0</div>
+              <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Featured</div>
+            </div>
           </div>
-          <div class="dash-stat">
-            <div class="dash-stat-icon icon-cyan">💼</div>
-            <div><div class="dash-stat-num" id="stat-services">0</div><div class="dash-stat-label">Dịch vụ</div></div>
-          </div>
-        </div>
-        <!-- Category breakdown -->
-        <div class="table-wrap" style="padding:1.5rem;">
-          <div class="panel-title" style="margin-bottom:1rem;">Phân loại theo thể loại</div>
-          <div id="cat-breakdown" style="display:flex;gap:1rem;flex-wrap:wrap;"></div>
-        </div>
-      </div>
-
-      <!-- ── HERO IMAGES ── -->
-      <div id="tab-hero" class="tab-panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Quản lý Hình nền (Background)</div>
-            <div class="panel-subtitle">Quản lý danh sách ảnh hiển thị ở khu vực Hero Banner trên Trang chủ</div>
-          </div>
-        </div>
-        
-        <div class="table-wrap" style="padding:1.5rem; margin-bottom: 2rem;">
-          <div class="form-row">
-            <label class="form-label-admin">Upload hình nền mới</label>
-            <div class="upload-zone" id="hero-upload-zone">
-              <div class="upload-zone-icon">🌄</div>
-              <p><strong>Click hoặc kéo thả</strong> ảnh để upload</p>
-              <p>Khuyến nghị kích thước ngang (1920x1080px), định dạng JPG/WEBP — Tối đa 20MB</p>
-              <input type="file" id="hero-files" accept="image/*" multiple />
-              <div class="upload-progress"><div class="upload-progress-bar" id="hero-upload-progress" style="width:0%"></div></div>
+          <div class="glass-card stat-grad-4 p-8 rounded-2xl flex items-center gap-6">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-cyan-500/20 text-cyan-400">
+              <i data-lucide="briefcase" class="w-7 h-7"></i>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold tracking-tight" id="stat-services">0</div>
+              <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Dịch vụ</div>
             </div>
           </div>
         </div>
 
-        <div id="admin-hero-grid" class="admin-photo-grid">
-          <div class="loading"><div class="spinner"></div></div>
+        <!-- Category breakdown -->
+        <div class="glass-heavy p-10 rounded-2xl border border-white/5 relative overflow-hidden">
+          <div class="flex items-center justify-between mb-8">
+            <h3 class="text-lg font-bold flex items-center gap-3">
+              <i data-lucide="pie-chart" class="w-5 h-5 text-brand-primary"></i> Phân loại theo thể loại
+            </h3>
+          </div>
+          <div id="cat-breakdown" class="flex flex-wrap gap-4"></div>
+        </div>
+      </div>
+
+      <!-- ── HERO IMAGES ── -->
+      <div id="tab-hero" class="tab-panel space-y-10">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h2 class="text-2xl font-black tracking-tight text-gradient">Quản lý Hình nền</h2>
+            <p class="text-slate-400 mt-1">Ảnh hiển thị lớn ở trang chủ (Background Hero)</p>
+          </div>
+        </div>
+        
+        <div class="glass-heavy p-8 md:p-12 rounded-2xl border border-white/5">
+          <div class="max-w-3xl mx-auto text-center space-y-6">
+            <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-6 text-center">Kéo thả để upload mới</label>
+            <div class="upload-zone relative group p-12 border-2 border-dashed border-white/10 hover:border-brand-primary/50 hover:bg-brand-primary/5 rounded-3xl transition-all duration-300" id="hero-upload-zone">
+              <i data-lucide="cloud-upload" class="w-12 h-12 text-slate-600 group-hover:text-brand-primary mx-auto mb-4 transition-colors"></i>
+              <p class="text-slate-300"><strong>Nhấn để chọn</strong> hoặc kéo thả ảnh vào đây</p>
+              <p class="text-xs text-slate-500 mt-2">Định dạng JPG/WEBP — Tối đa 20MB</p>
+              <input type="file" id="hero-files" accept="image/*" multiple class="absolute inset-0 opacity-0 cursor-pointer" />
+              <div class="absolute bottom-0 left-0 w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                <div class="h-full primary-gradient transition-all duration-500" id="hero-upload-progress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="admin-hero-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="loading flex flex-col items-center justify-center py-20 opacity-50"><div class="spinner mb-4"></div>Đang tải...</div>
         </div>
       </div>
 
       <!-- ── PHOTOS ── -->
-      <div id="tab-photos" class="tab-panel">
-        <div class="panel-header">
+      <div id="tab-photos" class="tab-panel space-y-10">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/5 p-6 rounded-2xl border border-white/5 panel-header">
           <div>
-            <div class="panel-title">Quản lý ảnh</div>
-            <div class="panel-subtitle">Thêm, sửa, xóa và upload ảnh cho từng thể loại</div>
+            <h2 class="text-2xl font-black tracking-tight text-gradient">Thư viện Gallery</h2>
+            <p class="text-slate-400 mt-1">Quản lý toàn bộ tác phẩm hiển thị trên Portfolio</p>
           </div>
-          <div style="display:flex;gap:.5rem;align-items:center;">
-            <!-- Filter tabs in admin -->
-            <select class="admin-cat-filter" id="admin-cat-filter">
-              <option value="All">Tất cả</option>
+          <div class="flex flex-wrap items-center gap-4">
+            <select class="admin-input !w-44 !bg-brand-surface !py-2.5 !text-sm" id="admin-cat-filter">
+              <option value="All">Tất cả thể loại</option>
               <option value="Wedding">💍 Wedding</option>
               <option value="Portrait">🎭 Portrait</option>
               <option value="Event">🎊 Event</option>
               <option value="Product">📦 Product</option>
             </select>
-            <button class="btn btn-primary" id="btn-add-photo">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Thêm ảnh
+            <button class="px-6 py-2.5 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 text-sm" id="btn-add-photo">
+              <i data-lucide="plus" class="w-4 h-4"></i> Thêm ảnh mới
             </button>
           </div>
         </div>
-        <!-- Photo grid view -->
-        <div id="admin-photo-grid" class="admin-photo-grid">
-          <div class="loading"><div class="spinner"></div></div>
+
+        <div id="admin-photo-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div class="loading flex flex-col items-center justify-center py-20 opacity-50"><div class="spinner mb-4"></div>Đang tải...</div>
         </div>
       </div>
 
       <!-- ── ABOUT ── -->
-      <div id="tab-about" class="tab-panel">
-        <div class="panel-header">
-          <div><div class="panel-title">Thông tin cá nhân</div><div class="panel-subtitle">Cập nhật profile nhiếp ảnh gia</div></div>
-          <button class="btn btn-primary" id="btn-save-about">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Lưu thay đổi
+      <div id="tab-about" class="tab-panel space-y-10">
+        <div class="flex items-center justify-between panel-header">
+          <h2 class="text-2xl font-black tracking-tight text-gradient">Hồ sơ cá nhân</h2>
+          <button class="px-8 py-3 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-2" id="btn-save-about">
+            <i data-lucide="save" class="w-5 h-5"></i> Lưu cấu hình
           </button>
         </div>
-        <div class="table-wrap" style="padding:1.5rem;">
-          <form id="about-form">
-            <div class="form-row-2">
-              <div>
-                <label class="form-label-admin">Họ tên <span class="required">*</span></label>
-                <input class="form-control" type="text" id="about-name" placeholder="Nguyễn Văn A" />
+        
+        <div class="glass-heavy p-8 md:p-12 rounded-3xl border border-white/5">
+          <form id="about-form" class="space-y-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div class="space-y-6">
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Họ & Tên <span class="text-red-400">*</span></label>
+                  <input class="admin-input" type="text" id="about-name" placeholder="Ví dụ: Nguyễn Văn A" />
+                </div>
+                <div>
+                   <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Chức danh / Slogan <span class="text-red-400">*</span></label>
+                  <input class="admin-input" type="text" id="about-title" placeholder="Ví dụ: Professional Photographer" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Email liên hệ</label>
+                  <input class="admin-input" type="email" id="about-email" placeholder="contact@example.com" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Số điện thoại</label>
+                  <input class="admin-input" type="tel" id="about-phone" placeholder="0901 234 567" />
+                </div>
               </div>
-              <div>
-                <label class="form-label-admin">Chức danh <span class="required">*</span></label>
-                <input class="form-control" type="text" id="about-title" placeholder="Professional Photographer" />
+
+              <div class="space-y-6">
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Avatar / Ảnh chân dung</label>
+                  <div class="flex items-start gap-6">
+                    <div class="w-24 h-24 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0 relative group" id="about-avatar-preview">
+                      <img id="about-avatar-preview-img" class="w-full h-full object-cover hidden" src="" alt="Avatar" />
+                      <div class="absolute inset-0 flex items-center justify-center text-slate-600 bg-black/40 group-hover:opacity-100 opacity-0 transition-opacity cursor-pointer" id="about-avatar-remove">
+                        <i data-lucide="trash-2" class="w-5 h-5 text-white"></i>
+                      </div>
+                      <div class="absolute inset-0 flex items-center justify-center text-slate-600" id="avatar-placeholder-icon">
+                        <i data-lucide="user" class="w-8 h-8"></i>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="upload-zone relative p-6 border border-dashed border-white/10 hover:border-brand-primary/50 hover:bg-brand-primary/5 rounded-2xl transition-all" id="about-avatar-zone">
+                        <p class="text-xs text-slate-400 text-center font-medium">Nhấn để thay đổi</p>
+                        <input type="file" id="about-avatar-file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" />
+                        <div class="mt-4 h-1 bg-white/5 rounded-full overflow-hidden">
+                          <div class="h-full primary-gradient transition-all" id="about-avatar-progress" style="width:0%"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="about-avatar-url" />
+                </div>
+                
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Mạng xã hội</label>
+                  <div class="space-y-3">
+                    <div class="relative">
+                      <i data-lucide="instagram" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                      <input class="admin-input pl-11 !py-2.5 text-sm" type="url" id="about-instagram" placeholder="Link Instagram..." />
+                    </div>
+                    <div class="relative">
+                      <i data-lucide="facebook" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                      <input class="admin-input pl-11 !py-2.5 text-sm" type="url" id="about-facebook" placeholder="Link Facebook..." />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="form-row">
-              <label class="form-label-admin">Giới thiệu</label>
-              <textarea class="form-control" id="about-bio" rows="4" placeholder="Mô tả về bản thân và phong cách chụp ảnh..."></textarea>
-            </div>
-            <div class="form-row">
-              <label class="form-label-admin">Ảnh đại diện / Portrait</label>
-              <div class="upload-zone" id="about-avatar-zone">
-                <div class="upload-zone-icon">🖼️</div>
-                <p><strong>Click hoặc kéo thả</strong> để upload ảnh chân dung</p>
-                <p>PNG, JPG, WEBP — Tối đa 20MB</p>
-                <input type="file" id="about-avatar-file" accept="image/*" />
-                <div class="upload-progress"><div class="upload-progress-bar" id="about-avatar-progress" style="width:0%"></div></div>
-              </div>
-              <div class="upload-preview" id="about-avatar-preview">
-                <img id="about-avatar-preview-img" src="" alt="Preview" />
-                <button type="button" class="upload-preview-remove" id="about-avatar-remove">✕</button>
-              </div>
-              <input type="hidden" id="about-avatar-url" />
-            </div>
-            <div class="form-row-2">
-              <div>
-                <label class="form-label-admin">Email</label>
-                <input class="form-control" type="email" id="about-email" placeholder="contact@example.com" />
-              </div>
-              <div>
-                <label class="form-label-admin">Số điện thoại</label>
-                <input class="form-control" type="tel" id="about-phone" placeholder="0901 234 567" />
-              </div>
-            </div>
-            <div class="form-row-2">
-              <div>
-                <label class="form-label-admin">Instagram URL</label>
-                <input class="form-control" type="url" id="about-instagram" placeholder="https://instagram.com/..." />
-              </div>
-              <div>
-                <label class="form-label-admin">Facebook URL</label>
-                <input class="form-control" type="url" id="about-facebook" placeholder="https://facebook.com/..." />
-              </div>
+
+            <div class="pt-6 border-t border-white/5">
+              <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Giới thiệu bản thân / Tiểu sử</label>
+              <textarea class="admin-input min-h-[160px] leading-relaxed" id="about-bio" placeholder="Viết vài dòng giới thiệu về bản thân và phong cách nhiếp ảnh của bạn..."></textarea>
             </div>
           </form>
         </div>
       </div>
 
       <!-- ── SERVICES ── -->
-      <div id="tab-services" class="tab-panel">
-        <div class="panel-header">
-          <div><div class="panel-title">Dịch vụ</div><div class="panel-subtitle">Quản lý các dịch vụ nhiếp ảnh</div></div>
-          <button class="btn btn-primary" id="btn-add-service">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Thêm dịch vụ
+      <div id="tab-services" class="tab-panel space-y-10">
+        <div class="flex items-center justify-between panel-header">
+          <div>
+            <h2 class="text-2xl font-black tracking-tight text-gradient">Dịch vụ cung cấp</h2>
+            <p class="text-slate-400 mt-1">Các gói chụp ảnh bạn đang kinh doanh</p>
+          </div>
+          <button class="px-6 py-2.5 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.02] transition-all flex items-center gap-2 text-sm" id="btn-add-service">
+            <i data-lucide="plus" class="w-4 h-4"></i> Thêm dịch vụ
           </button>
         </div>
-        <div id="services-admin-grid" class="skills-admin-grid">
-          <div class="loading"><div class="spinner"></div></div>
+        <div id="services-admin-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div class="loading flex items-center justify-center py-20 opacity-50"><div class="spinner"></div></div>
         </div>
       </div>
 
       <!-- ── CLIENT ALBUMS ── -->
-      <div id="tab-client-albums" class="tab-panel">
-        <div class="panel-header">
+      <div id="tab-client-albums" class="tab-panel space-y-10">
+         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/5 p-6 rounded-2xl border border-white/5 panel-header">
           <div>
-            <div class="panel-title">Quản lý Client Albums</div>
-            <div class="panel-subtitle">Tạo bộ ảnh riêng tư và giao cho từng khách hàng qua email Google</div>
+            <h2 class="text-2xl font-black tracking-tight text-gradient">Album Khách Hàng</h2>
+            <p class="text-slate-400 mt-1">Quản lý kho ảnh riêng tư dành cho từng khách hàng</p>
           </div>
-          <button class="btn btn-primary" id="btn-add-client-album">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Tạo Album
+          <button class="px-6 py-3 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-2" id="btn-add-client-album">
+            <i data-lucide="folder-plus" class="w-5 h-5"></i> Tạo Album mới
           </button>
         </div>
-        <div id="client-albums-grid">
-          <div class="loading"><div class="spinner"></div></div>
+        
+        <!-- Filter Tabs for Client Albums -->
+        <div id="client-albums-grid-container" class="space-y-8">
+           <div id="client-albums-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div class="loading flex flex-col items-center justify-center py-20 opacity-50"><div class="spinner mb-4"></div>Đang tải...</div>
+          </div>
         </div>
       </div>
 
       <!-- ── SETTINGS ── -->
       <div id="tab-settings" class="tab-panel">
-        <div class="panel-header"><div><div class="panel-title">Đổi mật khẩu</div></div></div>
-        <div class="table-wrap" style="padding:1.5rem;max-width:480px;">
-          <form id="change-password-form">
-            <div class="form-row"><label class="form-label-admin">Mật khẩu hiện tại</label><input class="form-control" type="password" id="curr-pw" required /></div>
-            <div class="form-row"><label class="form-label-admin">Mật khẩu mới</label><input class="form-control" type="password" id="new-pw" required /></div>
-            <div class="form-row"><label class="form-label-admin">Xác nhận mật khẩu mới</label><input class="form-control" type="password" id="confirm-pw" required /></div>
-            <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+        <div class="flex items-center justify-center min-h-[60vh] w-full">
+          <div class="glass-heavy p-10 md:p-12 rounded-3xl border border-white/5 w-full max-w-lg shadow-2xl">
+          <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-brand-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-primary">
+              <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-black tracking-tight text-gradient">Bảo mật tài khoản</h2>
+            <p class="text-slate-500 mt-2">Đổi mật khẩu định kỳ để bảo vệ dữ liệu</p>
+          </div>
+          
+          <form id="change-password-form" class="space-y-6">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase tracking-widest text-slate-500">Mật khẩu hiện tại</label>
+              <input class="admin-input" type="password" id="curr-pw" required />
+            </div>
+            <div class="space-y-4">
+               <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-500">Mật khẩu mới</label>
+                <input class="admin-input" type="password" id="new-pw" required />
+              </div>
+              <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-widest text-slate-500">Xác nhận mật khẩu mới</label>
+                <input class="admin-input" type="password" id="confirm-pw" required />
+              </div>
+            </div>
+            <button type="submit" class="w-full py-4 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all">
+              Cập nhật mật khẩu
+            </button>
           </form>
+          </div>
         </div>
       </div>
 
@@ -330,238 +472,245 @@
 
 <!-- ─── PHOTO MODAL ───────────────────────────────────────────────────────── -->
 <div class="modal-overlay-admin" id="photo-modal-overlay">
-  <div class="modal-dialog" style="max-width:640px;" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <h3 id="photo-modal-heading">Thêm ảnh</h3>
-      <button class="modal-close-btn" id="photo-modal-close">✕</button>
+  <div class="modal-dialog w-full max-w-2xl max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-brand-surface/80 backdrop-blur-xl z-10">
+      <h3 class="text-xl font-bold text-gradient" id="photo-modal-heading">Quản lý Ảnh</h3>
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-400 transition-colors" id="photo-modal-close"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
-    <div class="modal-body-admin">
+    
+    <div class="p-8 space-y-8">
       <input type="hidden" id="photo-edit-id" />
-      <div class="form-row">
-        <label class="form-label-admin">Tiêu đề <span class="required">*</span></label>
-        <input class="form-control" type="text" id="p-title" placeholder="Tên bộ ảnh..." />
-      </div>
-      <div class="form-row">
-        <label class="form-label-admin">Mô tả</label>
-        <textarea class="form-control" id="p-desc" rows="2" placeholder="Mô tả ngắn..."></textarea>
-      </div>
-      <div class="form-row-2">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Tiêu đề bộ ảnh <span class="text-red-400">*</span></label>
+          <input class="admin-input" type="text" id="p-title" placeholder="Nhập tên bộ ảnh..." />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Mô tả ngắn</label>
+          <textarea class="admin-input min-h-[80px]" id="p-desc" placeholder="Tóm tắt về bộ ảnh..."></textarea>
+        </div>
         <div>
-          <label class="form-label-admin">Thể loại <span class="required">*</span></label>
-          <select class="form-control" id="p-category">
-            <option value="Wedding">💍 Wedding</option>
-            <option value="Portrait">🎭 Portrait</option>
-            <option value="Event">🎊 Event</option>
-            <option value="Product">📦 Product</option>
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Thể loại <span class="text-red-400">*</span></label>
+          <select class="admin-input" id="p-category">
+            <option value="Wedding">Wedding</option>
+            <option value="Portrait">Portrait</option>
+            <option value="Event">Event</option>
+            <option value="Product">Product</option>
           </select>
         </div>
         <div>
-          <label class="form-label-admin">Thứ tự hiển thị</label>
-          <input class="form-control" type="number" id="p-order" value="0" min="0" />
-        </div>
-      </div>
-      <!-- Upload zone -->
-      <div class="form-row">
-        <label class="form-label-admin">Upload ảnh <span class="required">*</span></label>
-        <div class="upload-zone" id="photo-upload-zone">
-          <div class="upload-zone-icon">📸</div>
-          <p><strong>Click hoặc kéo thả</strong> để upload ảnh</p>
-          <p>JPG, PNG, WEBP — Tối đa 20MB (khuyến nghị độ phân giải cao)</p>
-          <input type="file" id="photo-file" accept="image/*" />
-          <div class="upload-progress"><div class="upload-progress-bar" id="photo-upload-progress" style="width:0%"></div></div>
-        </div>
-        <div class="upload-preview" id="photo-preview">
-          <img id="photo-preview-img" src="" alt="Preview" />
-          <button type="button" class="upload-preview-remove" id="photo-preview-remove">✕</button>
-        </div>
-        <input type="hidden" id="p-image-url" />
-        <div style="margin-top:.5rem;">
-          <label class="form-label-admin">Hoặc nhập URL ảnh</label>
-          <input class="form-control" type="url" id="p-image-url-input" placeholder="https://..." />
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Thứ tự hiển thị</label>
+          <input class="admin-input" type="number" id="p-order" value="0" min="0" />
         </div>
       </div>
 
-      <!-- Detail Images Upload zone -->
-      <div class="form-row">
-        <label class="form-label-admin">Hình ảnh chi tiết (Nhiều ảnh, tùy chọn)</label>
-        <div class="upload-zone" id="detail-upload-zone">
-          <div class="upload-zone-icon">🖼️</div>
-          <p><strong>Click hoặc kéo thả</strong> để upload nhiều ảnh chi tiết cho album</p>
-          <input type="file" id="detail-files" accept="image/*" multiple />
-          <div class="upload-progress"><div class="upload-progress-bar" id="detail-upload-progress" style="width:0%"></div></div>
+      <!-- Main Photo Upload -->
+      <div class="space-y-4">
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500">Ảnh đại diện Gallery <span class="text-red-400">*</span></label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="upload-zone relative p-10 border-2 border-dashed border-white/10 hover:border-brand-primary/50 hover:bg-brand-primary/5 rounded-2xl transition-all text-center group" id="photo-upload-zone">
+            <i data-lucide="upload-cloud" class="w-10 h-10 text-slate-600 group-hover:text-brand-primary mx-auto mb-3 transition-colors"></i>
+            <p class="text-xs text-slate-400">Kéo thả ảnh tại đây</p>
+            <input type="file" id="photo-file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" />
+            <div class="mt-4 h-1 bg-white/5 rounded-full overflow-hidden">
+               <div class="h-full primary-gradient transition-all" id="photo-upload-progress" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="relative group rounded-2xl overflow-hidden border border-white/10 bg-white/5 min-h-[140px] hidden" id="photo-preview">
+            <img id="photo-preview-img" src="" alt="Preview" class="w-full h-full object-cover" />
+            <button type="button" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" id="photo-preview-remove"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </div>
         </div>
-        <div class="detail-images-preview" id="detail-preview-container" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-          <!-- Detail images thumbnails go here -->
+        <input type="hidden" id="p-image-url" />
+        <div class="relative">
+          <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold uppercase tracking-widest">URL:</div>
+          <input class="admin-input pl-16 text-sm" type="url" id="p-image-url-input" placeholder="Hoặc dán URL ảnh trực tiếp..." />
         </div>
       </div>
-      <div class="form-row-2">
+
+      <!-- Detail Photos -->
+      <div class="space-y-4 pt-6 border-t border-white/5">
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500">Hình ảnh chi tiết (Album view)</label>
+        <div class="upload-zone relative p-8 border-2 border-dashed border-white/10 hover:border-brand-primary/40 rounded-2xl transition-all text-center bg-white/2" id="detail-upload-zone">
+          <p class="text-[11px] text-slate-500 uppercase tracking-wider font-bold">Thêm nhiều ảnh chi tiết</p>
+          <input type="file" id="detail-files" accept="image/*" multiple class="absolute inset-0 opacity-0 cursor-pointer" />
+          <div class="mt-4 h-1 bg-white/5 rounded-full overflow-hidden">
+             <div class="h-full primary-gradient transition-all" id="detail-upload-progress" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3" id="detail-preview-container"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
         <div>
-          <label class="form-label-admin">Địa điểm</label>
-          <input class="form-control" type="text" id="p-location" placeholder="TP.HCM, Đà Lạt..." />
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Địa điểm</label>
+           <div class="relative">
+            <i data-lucide="map-pin" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+            <input class="admin-input pl-11 !py-2.5 text-sm" type="text" id="p-location" placeholder="Đà Lạt, TP.HCM..." />
+          </div>
         </div>
         <div>
-          <label class="form-label-admin">Ngày chụp</label>
-          <input class="form-control" type="date" id="p-date" />
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Ngày chụp</label>
+          <input class="admin-input !py-2.5 text-sm" type="date" id="p-date" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Tags</label>
+          <input class="admin-input text-sm" type="text" id="p-tags" placeholder="wedding, portrait, cinematic..." />
         </div>
       </div>
-      <div class="form-row">
-        <label class="form-label-admin">Tags (cách nhau bởi dấu phẩy)</label>
-        <input class="form-control" type="text" id="p-tags" placeholder="outdoor, golden hour, romantic..." />
-      </div>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:.75rem;">
-        <label class="checkbox-row"><input type="checkbox" id="p-visible" checked /> Hiển thị trên gallery</label>
-        <label class="checkbox-row"><input type="checkbox" id="p-featured" /> Featured (hiện ở trang chủ ⭐)</label>
+
+      <div class="flex flex-wrap gap-8 items-center pt-4">
+        <label class="flex items-center gap-3 cursor-pointer group">
+          <input type="checkbox" id="p-visible" checked class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-brand-primary transition-all cursor-pointer" />
+          <span class="text-sm font-bold text-slate-400 group-hover:text-white transition-colors">Hiển thị Gallery</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer group">
+          <input type="checkbox" id="p-featured" class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-amber-500 transition-all cursor-pointer" />
+          <span class="text-sm font-bold text-slate-400 group-hover:text-white transition-colors">Nổi bật (Trang chủ ⭐)</span>
+        </label>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" id="photo-cancel-btn">Hủy</button>
-      <button class="btn btn-primary" id="photo-save-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
-        Lưu ảnh
+
+    <div class="p-6 bg-white/2 border-t border-white/5 flex justify-end gap-3 sticky bottom-0 backdrop-blur-xl">
+      <button class="px-6 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all text-sm font-bold" id="photo-cancel-btn">Hủy bỏ</button>
+      <button class="px-8 py-2.5 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.02] flex items-center gap-2 text-sm" id="photo-save-btn">
+        <i data-lucide="check" class="w-4 h-4"></i> Lưu dữ liệu
       </button>
     </div>
   </div>
 </div>
 
 <!-- ─── CLIENT ALBUM MODAL ──────────────────────────────────────────────────── -->
-<!-- Album Detail Overlay -->
 <div class="ad-overlay" id="album-detail-overlay">
   <div class="ad-panel">
-    <div class="ad-panel-header">
-      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('album-detail-overlay').classList.remove('open')">
-        ← Trở lại
+    <div class="p-6 border-b border-white/5 flex items-center justify-between bg-brand-surface/50 backdrop-blur-xl">
+      <h3 class="text-lg font-bold flex items-center gap-3"><i data-lucide="folder-open" class="text-brand-primary"></i> Chi tiết Album & Lựa chọn của khách</h3>
+      <button class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold transition-all flex items-center gap-2" onclick="document.getElementById('album-detail-overlay').classList.remove('open')">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i> Quay lại
       </button>
     </div>
-    <div class="ad-panel-body" id="album-detail-content">
-      <div class="loading"><div class="spinner"></div></div>
+    <div class="flex-1 overflow-y-auto p-10" id="album-detail-content">
+      <div class="loading flex flex-col items-center justify-center py-20"><div class="spinner mb-4"></div></div>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay-admin" id="client-album-modal-overlay">
-  <div class="modal-dialog" style="max-width:520px;" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <h3 id="ca-modal-heading">Tạo Client Album</h3>
-      <button class="modal-close-btn" id="ca-modal-close">✕</button>
+  <div class="modal-dialog w-full max-w-xl max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-brand-surface/80 backdrop-blur-xl z-10">
+      <h3 class="text-xl font-bold text-gradient" id="ca-modal-heading">Tạo Album Khách Hàng</h3>
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-400" id="ca-modal-close"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
-    <div class="modal-body-admin">
+    
+    <div class="p-8 space-y-8">
       <input type="hidden" id="ca-edit-id" />
-      <div class="form-row-2">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="form-label-admin">Tên album <span class="required">*</span></label>
-          <input class="form-control" type="text" id="ca-title" placeholder="Ảnh cưới Minh & Lan — 12/2025" />
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Tên bộ ảnh <span class="text-red-400">*</span></label>
+          <input class="admin-input" type="text" id="ca-title" placeholder="Ví dụ: Wedding Minh & Lan" />
         </div>
         <div>
-          <label class="form-label-admin">Trạng thái</label>
-          <select class="form-control" id="ca-status">
-            <option value="draft">📝 Bản nháp</option>
-            <option value="waiting">👁️ Chờ khách xem</option>
-            <option value="selecting">🖼️ Khách đang chọn</option>
-            <option value="selected">✅ Khách chọn xong</option>
-            <option value="editing">⚙️ Đang hậu kỳ</option>
-            <option value="ready">📦 Sẵn sàng bàn giao</option>
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Tiến độ Album</label>
+          <select class="admin-input text-sm" id="ca-status">
+            <option value="draft">Bản nháp</option>
+            <option value="waiting">Chờ khách xem</option>
+            <option value="selecting">Khách đang chọn</option>
+            <option value="selected">Khách chọn xong</option>
+            <option value="editing">Đang hậu kỳ</option>
+            <option value="ready">Sẵn sàng bàn giao</option>
           </select>
         </div>
       </div>
-      <!-- Privacy + Copy Link row -->
-      <div class="form-row privacy-link-row">
-        <div class="privacy-toggle-group">
-          <label class="form-label-admin">Quyền riêng tư</label>
-          <div class="privacy-options">
-            <label class="privacy-opt" id="priv-opt-private">
-              <input type="radio" name="ca-privacy" id="ca-privacy-private" value="0" checked />
-              <span class="privacy-opt-inner">
-                <span class="privacy-icon">🔒</span>
-                <span>
-                  <strong>Riêng tư</strong>
-                  <small>Chỉ email được cấp quyền</small>
-                </span>
-              </span>
+
+      <div class="space-y-6">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Quyền truy cập</label>
+          <div class="grid grid-cols-2 gap-4">
+             <label class="relative cursor-pointer group">
+              <input type="radio" name="ca-privacy" id="ca-privacy-private" value="0" checked class="peer sr-only" />
+              <div class="p-4 rounded-2xl border border-white/5 bg-white/2 peer-checked:border-brand-primary/50 peer-checked:bg-brand-primary/5 transition-all text-center">
+                <i data-lucide="lock" class="w-6 h-6 mx-auto mb-2 text-slate-500 peer-checked:text-brand-primary"></i>
+                <p class="text-xs font-bold uppercase tracking-widest">Riêng tư</p>
+                <p class="text-[10px] text-slate-500 mt-1 leading-relaxed">Chỉ email được cấp quyền</p>
+              </div>
             </label>
-            <label class="privacy-opt" id="priv-opt-public">
-              <input type="radio" name="ca-privacy" id="ca-privacy-public" value="1" />
-              <span class="privacy-opt-inner">
-                <span class="privacy-icon">🌐</span>
-                <span>
-                  <strong>Công khai</strong>
-                  <small>Ai đăng nhập cũng xem được</small>
-                </span>
-              </span>
+            <label class="relative cursor-pointer group">
+              <input type="radio" name="ca-privacy" id="ca-privacy-public" value="1" class="peer sr-only" />
+              <div class="p-4 rounded-2xl border border-white/5 bg-white/2 peer-checked:border-brand-primary/50 peer-checked:bg-brand-primary/5 transition-all text-center">
+                <i data-lucide="globe" class="w-6 h-6 mx-auto mb-2 text-slate-500 peer-checked:text-brand-primary"></i>
+                <p class="text-xs font-bold uppercase tracking-widest">Công khai</p>
+                <p class="text-[10px] text-slate-500 mt-1 leading-relaxed">Dành cho mọi khách hàng</p>
+              </div>
             </label>
           </div>
         </div>
-        <div class="copy-link-group" id="copy-link-group" style="display:none">
-          <label class="form-label-admin">Link album khách hàng</label>
-          <div class="copy-link-box">
-            <input type="text" class="form-control" id="ca-album-link" readonly />
-            <button type="button" class="btn btn-primary btn-sm" id="ca-copy-link-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Copy
+
+        <div class="bg-brand-primary/5 border border-brand-primary/10 rounded-2xl p-6 space-y-3 hidden" id="copy-link-group">
+          <label class="block text-[10px] font-black uppercase tracking-widest text-brand-primary">Link truy cập dành cho khách</label>
+          <div class="flex gap-2">
+            <input type="text" class="flex-1 bg-black/20 border border-white/5 rounded-xl px-4 py-2 text-xs font-medium" id="ca-album-link" readonly />
+            <button type="button" class="px-4 rounded-xl bg-brand-primary text-white text-xs font-bold" id="ca-copy-link-btn">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Tên khách hàng</label>
+          <input class="admin-input text-sm" type="text" id="ca-client-name" placeholder="Ví dụ: Mr. Minh" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Ghi chú nội bộ</label>
+          <input class="admin-input text-sm" type="text" id="ca-desc" placeholder="Ghi chú về gói chụp..." />
+        </div>
+      </div>
+
+      <div class="space-y-4 pt-6 border-t border-white/5">
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Cấp quyền qua Email (Google Login)</label>
+        <div class="glass border border-white/10 p-3 rounded-2xl transition-all focus-within:border-brand-primary min-h-[100px]" id="email-tags-container">
+           <div id="email-tags-list" class="flex flex-wrap gap-2 mb-2"></div>
+           <input type="email" id="ca-email-input" class="w-full bg-transparent border-none outline-none text-sm p-1" placeholder="Nhập email rồi nhấn Enter..." autocomplete="off" />
+        </div>
+        <p class="text-[10px] text-slate-500 font-medium italic">* Nhấn Enter hoặc dấu phẩy để xác nhận email.</p>
+      </div>
+
+      <div class="space-y-2 pt-6 border-t border-white/5">
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-500">Google Drive Folder ID / URL <span class="text-red-400">*</span></label>
+        <input class="admin-input text-xs" type="url" id="ca-drive" placeholder="Nhập link thư mục Drive..." />
+        <p class="text-[10px] text-slate-500 italic">* Folder phải được kích hoạt 'Anyone with the link can view'</p>
+      </div>
+
+      <div class="space-y-4 pt-6 border-t border-white/5">
+         <label class="block text-xs font-bold uppercase tracking-widest text-slate-500">Ảnh bìa Album</label>
+         <div class="flex gap-2 mb-4">
+            <button type="button" class="flex-1 py-2 rounded-xl bg-white/5 text-[10px] font-bold uppercase tracking-wider hover:bg-white/10 transition-all border border-white/5" id="ca-tab-upload">Upload</button>
+            <button type="button" class="flex-1 py-2 rounded-xl bg-white/5 text-[10px] font-bold uppercase tracking-wider hover:bg-white/10 transition-all border border-white/5" id="ca-tab-url">URL / Drive</button>
+         </div>
+         
+         <div id="ca-panel-upload" class="upload-zone p-10 border-2 border-dashed border-white/10 hover:border-brand-primary/30 rounded-2xl text-center relative group">
+            <i data-lucide="image-plus" class="w-8 h-8 text-slate-600 mx-auto mb-3"></i>
+            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Chọn ảnh bìa</p>
+            <input type="file" id="ca-cover-file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" />
+            <div class="mt-4 h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full primary-gradient transition-all" id="ca-cover-progress" style="width:0%"></div></div>
+         </div>
+         
+         <div id="ca-panel-url" class="hidden">
+            <input class="admin-input text-xs" type="url" id="ca-cover-url-input" placeholder="Dán link ảnh tại đây..." />
+         </div>
+
+         <div class="relative group rounded-2xl overflow-hidden border border-white/10 hidden" id="ca-cover-preview">
+            <img id="ca-cover-preview-img" src="" alt="Cover preview" class="w-full max-h-[160px] object-cover" />
+            <button type="button" class="absolute inset-0 bg-red-500/80 text-white font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs uppercase tracking-widest" id="ca-cover-remove">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> Xóa ảnh bìa
             </button>
-          </div>
-        </div>
-      </div>
-      <div class="form-row-2">
-        <div>
-          <label class="form-label-admin">Tên khách hàng</label>
-          <input class="form-control" type="text" id="ca-client-name" placeholder="Nguyễn Văn A" />
-        </div>
-        <div>
-          <label class="form-label-admin">Mô tả</label>
-          <input class="form-control" type="text" id="ca-desc" placeholder="Ghi chú ngắn về bộ ảnh..." />
-        </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label-admin">Email truy cập album <span style="color:var(--text-muted);font-weight:400">(tùy chọn)</span></label>
-        <div class="email-tags-container" id="email-tags-container">
-          <div class="email-tags-list" id="email-tags-list"></div>
-          <input type="email" id="ca-email-input" class="email-tag-input" placeholder="Nhập email rồi nhấn Enter..." autocomplete="off" />
-        </div>
-        <small style="color:var(--text-muted);font-size:.75rem;margin-top:.3rem;display:block;">Thêm nhiều email. Mỗi email nhấn <kbd>Enter</kbd> hoặc <kbd>,</kbd> để xác nhận.</small>
-      </div>
-      <div class="form-row">
-        <label class="form-label-admin">Link thư mục Google Drive <span class="required">*</span></label>
-        <input class="form-control" type="url" id="ca-drive" placeholder="https://drive.google.com/drive/folders/..." />
-        <small style="color:var(--text-muted);font-size:.75rem;margin-top:.3rem;display:block;">Dán link thư mục Google Drive chứa ảnh (đã bật chế độ chia sẻ công khai).</small>
-      </div>
-      <div class="form-row">
-        <label class="form-label-admin">Ảnh bìa album</label>
-        <div class="cover-picker">
-          <div class="cover-picker-tabs">
-            <button type="button" class="cover-tab active" id="ca-tab-upload">📤 Upload từ máy</button>
-            <button type="button" class="cover-tab" id="ca-tab-url">🔗 Từ Drive / URL</button>
-          </div>
-          <!-- Panel: Upload từ máy -->
-          <div class="cover-panel" id="ca-panel-upload">
-            <div class="upload-zone" id="ca-cover-zone">
-              <div class="upload-zone-icon">🖼️</div>
-              <p><strong>Click hoặc kéo thả</strong> ảnh bìa vào đây</p>
-              <p>JPG, PNG, WEBP — Tối đa 20MB</p>
-              <input type="file" id="ca-cover-file" accept="image/*" />
-              <div class="upload-progress"><div class="upload-progress-bar" id="ca-cover-progress" style="width:0%"></div></div>
-            </div>
-          </div>
-          <!-- Panel: URL / Drive -->
-          <div class="cover-panel hidden" id="ca-panel-url">
-            <input class="form-control" type="url" id="ca-cover-url-input"
-              placeholder="https://drive.google.com/file/d/... hoặc link ảnh trực tiếp" />
-            <small style="color:var(--text-muted);font-size:.75rem;margin-top:.4rem;display:block;">
-              Dán link chia sẻ Google Drive hoặc URL ảnh bất kỳ. Đảm bảo ảnh Drive đã bật "Anyone with the link".
-            </small>
-          </div>
-          <!-- Preview -->
-          <div class="cover-preview" id="ca-cover-preview">
-            <img id="ca-cover-preview-img" src="" alt="Cover preview" />
-            <button type="button" class="cover-preview-remove" id="ca-cover-remove">✕ Xóa ảnh bìa</button>
-          </div>
-        </div>
-        <input type="hidden" id="ca-cover" />
+         </div>
+         <input type="hidden" id="ca-cover" />
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" id="ca-cancel-btn">Hủy</button>
-      <button class="btn btn-primary" id="ca-save-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+
+    <div class="p-6 bg-white/2 border-t border-white/5 flex justify-end gap-3 sticky bottom-0 backdrop-blur-xl">
+      <button class="px-6 py-2.5 rounded-xl text-slate-400 hover:text-white transition-all text-sm font-bold" id="ca-cancel-btn">Hủy bỏ</button>
+      <button class="px-10 py-2.5 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-brand-primary/25 hover:scale-[1.02] flex items-center gap-2" id="ca-save-btn">
         Lưu Album
       </button>
     </div>
@@ -570,53 +719,66 @@
 
 <!-- ─── SERVICE MODAL ─────────────────────────────────────────────────────── -->
 <div class="modal-overlay-admin" id="service-modal-overlay">
-  <div class="modal-dialog" style="max-width:480px;" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <h3 id="service-modal-heading">Thêm dịch vụ</h3>
-      <button class="modal-close-btn" id="service-modal-close">✕</button>
+  <div class="modal-dialog w-full max-w-sm max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-brand-surface/80 backdrop-blur-xl z-10">
+      <h3 class="text-lg font-bold" id="service-modal-heading">Quản lý Dịch vụ</h3>
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-400" id="service-modal-close"><i data-lucide="x" class="w-4 h-4"></i></button>
     </div>
-    <div class="modal-body-admin">
+    
+    <div class="p-8 space-y-6">
       <input type="hidden" id="service-edit-id" />
-      <div class="form-row-2">
+      <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="form-label-admin">Tên dịch vụ <span class="required">*</span></label>
-          <input class="form-control" type="text" id="s-name" placeholder="Wedding, Portrait..." />
+          <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Tên dịch vụ <span class="text-red-400">*</span></label>
+          <input class="admin-input !py-2.5 text-sm" type="text" id="s-name" placeholder="Wedding..." />
         </div>
         <div>
-          <label class="form-label-admin">Icon (emoji)</label>
-          <input class="form-control" type="text" id="s-icon" placeholder="💍" />
+          <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Emoji Icon</label>
+          <input class="admin-input !py-2.5 text-center text-lg" type="text" id="s-icon" placeholder="💍" />
         </div>
       </div>
-      <div class="form-row">
-        <label class="form-label-admin">Mô tả</label>
-        <textarea class="form-control" id="s-desc" rows="3" placeholder="Mô tả về dịch vụ này..."></textarea>
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Mô tả ngắn</label>
+        <textarea class="admin-input !py-2.5 text-sm min-h-[80px]" id="s-desc" placeholder="Mô tả gói dịch vụ..."></textarea>
       </div>
-      <div class="form-row">
-        <label class="form-label-admin">Thứ tự</label>
-        <input class="form-control" type="number" id="s-order" value="0" min="0" />
+      <div>
+        <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Thứ tự</label>
+        <input class="admin-input !py-2.5 text-sm" type="number" id="s-order" value="0" min="0" />
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" id="service-cancel-btn">Hủy</button>
-      <button class="btn btn-primary" id="service-save-btn">Lưu</button>
+
+    <div class="p-6 bg-white/2 border-t border-white/5 flex gap-3">
+       <button class="flex-1 py-3 rounded-xl bg-white/5 text-slate-400 font-bold text-xs uppercase" id="service-cancel-btn">Hủy</button>
+       <button class="flex-1 py-3 rounded-xl primary-gradient text-white font-bold text-xs uppercase" id="service-save-btn">Lưu dịch vụ</button>
     </div>
   </div>
 </div>
 
 <!-- ─── CONFIRM MODAL ─────────────────────────────────────────────────────── -->
 <div class="modal-overlay-admin" id="confirm-modal-overlay">
-  <div class="modal-dialog" style="max-width:400px;" role="alertdialog" aria-modal="true">
-    <div class="modal-header"><h3>Xác nhận xóa</h3><button class="modal-close-btn" id="confirm-modal-close">✕</button></div>
-    <div class="modal-body-admin"><p style="color:var(--text-secondary);font-size:.9rem;" id="confirm-modal-msg">Bạn có chắc chắn muốn xóa?</p></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" id="confirm-cancel-btn">Hủy</button>
-      <button class="btn btn-danger" id="confirm-delete-btn">🗑️ Xóa</button>
+  <div class="modal-dialog w-full max-w-xs p-10 text-center" role="alertdialog" aria-modal="true">
+    <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+      <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+    </div>
+    <h3 class="text-xl font-bold mb-3">Xác nhận xóa?</h3>
+    <p class="text-sm text-slate-400 mb-8 leading-relaxed" id="confirm-modal-msg">Hành động này không thể hoàn tác. Bạn có chắc chắn?</p>
+    
+    <div class="grid grid-cols-2 gap-3">
+      <button class="py-3 rounded-xl bg-white/5 text-slate-400 font-bold text-xs uppercase tracking-widest transition-all hover:bg-white/10" id="confirm-cancel-btn">Hủy bỏ</button>
+      <button class="py-3 rounded-xl bg-red-500 text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-red-500/25 active:scale-95" id="confirm-delete-btn">Đồng ý xóa</button>
     </div>
   </div>
 </div>
 
-<div id="toast-container"></div>
+<div id="toast-container" class="fixed bottom-8 right-8 z-[10000] space-y-3 pointer-events-none"></div>
 
-<script src="/js/admin.js?v=6.0"></script>
+<!-- Scripts -->
+<script>
+  // Initialize icons
+  window.addEventListener('load', () => {
+    lucide.createIcons();
+  });
+</script>
+<script src="/js/admin.js?v=7.5"></script>
 </body>
 </html>

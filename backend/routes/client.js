@@ -146,6 +146,8 @@ router.get('/albums', clientAuth, async (req, res) => {
     const requestMap = {};
     userRequests.forEach(r => { requestMap[r.album_id] = r.status; });
 
+    const queryAlbumId = req.query.album;
+
     const albums = allAlbums.map(a => {
       const emailList = a.client_email
         ? a.client_email.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
@@ -155,9 +157,22 @@ router.get('/albums', clientAuth, async (req, res) => {
       const { client_email, ...rest } = a;
       return {
         ...rest,
+        // We evaluate 'emailMatch' directly on 'a' for mapping, and keep 'has_access' logic
         has_access: hasAccess,
         request_status: hasAccess ? null : (requestMap[a.id] || null)
       };
+    }).filter(a => {
+      // Find the original DB record to extract emailMatch again
+      const original = allAlbums.find(x => x.id === a.id);
+      const emailList = original.client_email
+        ? original.client_email.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+        : [];
+      const emailMatch = emailList.includes(email);
+      const requested = requestMap[a.id];
+      const isSharedViaQuery = queryAlbumId && String(a.id) === String(queryAlbumId);
+      
+      // Keep only if explicitly mapped to email, or previously requested/interacted with, or explicitly opening URL
+      return emailMatch || requested || isSharedViaQuery;
     });
 
     res.json(albums);
@@ -177,6 +192,20 @@ router.get('/albums/:id/photos', clientAuth, async (req, res) => {
     const allowed = album.is_public ||
       (album.client_email ? album.client_email.split(',').map(e => e.trim()).includes(userEmail) : false);
     if (!allowed) return res.status(403).json({ error: 'Access denied.' });
+
+    // 🔔 Create admin notification for album view (throttle to once per hour per user)
+    const existingNotif = await db.getAsync(
+      "SELECT id FROM notifications WHERE type = 'view' AND album_id = ? AND email = ? AND created_at > datetime('now', '-1 hour')",
+      [req.params.id, userEmail]
+    );
+
+    if (!existingNotif) {
+      const msg = `đã truy cập vào album`;
+      await db.runAsync(
+        'INSERT INTO notifications (type, album_id, album_title, email, name, message) VALUES (?,?,?,?,?,?)',
+        ['view', req.params.id, album.title, userEmail, req.clientUser.name || '', msg]
+      );
+    }
 
     // Gọi Google Drive API để lấy TOÀN BỘ danh sách ảnh trong folder (có phân trang)
     const folderId = album.drive_folder_id;

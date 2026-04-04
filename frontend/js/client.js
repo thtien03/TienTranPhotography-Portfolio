@@ -43,11 +43,16 @@ function setPhotoComment(photoId, text) {
   if (card) updateCommentBadge(card, text.trim());
 }
 function updateCommentBadge(card, text) {
-  let badge = card.querySelector('.photo-comment-badge');
-  if (text) {
-    if (!badge) { badge = document.createElement('div'); badge.className = 'photo-comment-badge'; card.appendChild(badge); }
-    badge.innerHTML = '💬'; badge.title = text;
-  } else { badge?.remove(); }
+  const btn = card.querySelector('.pa-comment');
+  if (btn) {
+    if (text) {
+      btn.classList.add('bg-brand-primary', 'text-white');
+      btn.classList.remove('bg-white/10');
+    } else {
+      btn.classList.remove('bg-brand-primary', 'text-white');
+      btn.classList.add('bg-white/10');
+    }
+  }
 }
 function getPhotoState(photoId) {
   return selections[photoId] || null;
@@ -188,10 +193,14 @@ function enterDashboard(user) {
 
 function checkAutoOpenAlbum() {
   const params = new URLSearchParams(window.location.search);
-  const albumId = params.get('album');
+  let albumId = params.get('album');
+  if (!albumId) albumId = sessionStorage.getItem('pending_album_id');
+  
   if (!albumId) return;
   // Remove param from URL without reload
   history.replaceState(null, '', '/client');
+  sessionStorage.removeItem('pending_album_id');
+  
   // Find album in current list
   const card = document.querySelector(`.album-card[data-id="${albumId}"]`);
   if (card && !card.classList.contains('no-access')) {
@@ -206,7 +215,11 @@ async function loadAlbums() {
   grid.innerHTML = '<div class="albums-loading"><div class="loading-bars"><span></span><span></span><span></span><span></span></div></div>';
   empty.classList.add('hidden');
   try {
-    const res = await fetch(`${API_BASE}/albums`, {
+    const params = new URLSearchParams(window.location.search);
+    let albumId = params.get('album');
+    if (!albumId) albumId = sessionStorage.getItem('pending_album_id');
+    const url = albumId ? `${API_BASE}/albums?album=${albumId}` : `${API_BASE}/albums`;
+    const res = await fetch(url, {
       headers: { 'Authorization': 'Bearer ' + getToken() }
     });
     if (res.status === 401) return logout();
@@ -230,46 +243,68 @@ function renderAlbums(albums, grid, empty) {
       : '';
     const saved = loadSelections(a.id);
     const selCount = Object.values(saved).filter(v => v === 'selected').length;
-    const imgHtml = a.cover_image
-      ? `<img src="${escHtml(a.cover_image)}" alt="${escHtml(a.title)}" loading="lazy"/>`
-      : `<div class="album-card-placeholder"><div class="ic">📷</div></div>`;
 
     const privacyBadge = a.is_public
-      ? `<span class="album-privacy-badge public">🌐 Công khai</span>`
-      : `<span class="album-privacy-badge private">🔒 Riêng tư</span>`;
+      ? `<span class="absolute top-3 right-3 z-10 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5"><i data-lucide="globe" class="w-3 h-3"></i> Công khai</span>`
+      : `<span class="absolute top-3 right-3 z-10 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5"><i data-lucide="lock" class="w-3 h-3"></i> Riêng tư</span>`;
+
+    const imgClass = `absolute inset-0 w-full h-full object-cover transition-all duration-700 filter group-hover:scale-105 ${a.has_access ? 'brightness-75 group-hover:brightness-100 grayscale-[0.2] group-hover:grayscale-0' : 'brightness-50 grayscale blur-[2px]'}`;
+    
+    // placeholder
+    const placeholder = `<div class="absolute inset-0 bg-brand-deep flex items-center justify-center border border-white/5"><i data-lucide="image" class="w-12 h-12 text-slate-700"></i></div>`;
+    
+    const imgHtml = a.cover_image
+      ? `<img src="${escHtml(a.cover_image)}" alt="${escHtml(a.title)}" loading="lazy" class="${imgClass}" />`
+      : placeholder;
 
     // No access state
     if (!a.has_access) {
       const reqStatus = a.request_status;
       const requestArea = reqStatus === 'pending'
-        ? `<div class="album-request-pending">⏳ Đang chờ phê duyệt...</div>`
+        ? `<div class="mt-4 px-4 py-2.5 rounded-xl bg-orange-500/10 text-orange-400 text-[10px] font-mono tracking-widest uppercase border border-orange-500/20 flex items-center justify-center gap-2">⏳ Đang chờ duyệt</div>`
         : reqStatus === 'rejected'
-          ? `<button class="album-request-btn rejected" data-id="${a.id}">🔄 Gửi lại yêu cầu</button>`
-          : `<button class="album-request-btn" data-id="${a.id}">🔑 Yêu cầu xem album</button>`;
+          ? `<button class="album-request-btn mt-4 w-full px-4 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 text-[10px] font-mono tracking-widest uppercase border border-red-500/20 transition-all flex items-center justify-center gap-2" data-id="${a.id}"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Gửi lại yêu cầu</button>`
+          : `<button class="album-request-btn mt-4 w-full px-4 py-3 rounded-xl bg-white text-black text-[10px] font-mono tracking-widest uppercase shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2" data-id="${a.id}"><i data-lucide="key" class="w-3 h-3"></i> Yêu cầu truy cập</button>`;
+          
       return `
-        <div class="album-card no-access" data-id="${a.id}" data-title="${escHtml(a.title)}" data-desc="${escHtml(a.description || '')}">
+        <div class="album-card group relative aspect-[4/5] rounded-3xl overflow-hidden bg-brand-surface no-access opacity-0 translate-y-8 transition-all duration-700" data-id="${a.id}" data-title="${escHtml(a.title)}" data-desc="${escHtml(a.description || '')}">
           ${privacyBadge}
           ${imgHtml}
-          <div class="album-card-overlay always-show">
-            <div class="album-card-title">${escHtml(a.title)}</div>
-            ${a.description ? `<div class="album-card-desc">${escHtml(a.description)}</div>` : ''}
+          <div class="absolute inset-0 bg-gradient-to-t from-brand-deep via-brand-deep/60 to-transparent flex flex-col justify-end p-8">
+            <div class="font-display italic text-3xl font-light text-white leading-tight mb-2">${escHtml(a.title)}</div>
+            ${a.description ? `<div class="text-[11px] text-slate-500 font-mono tracking-wider uppercase truncate mb-2">${escHtml(a.description)}</div>` : ''}
             ${requestArea}
           </div>
         </div>`;
     }
 
     return `
-      <div class="album-card" data-id="${a.id}" data-title="${escHtml(a.title)}" data-desc="${escHtml(a.description || '')}">
+      <div class="album-card group relative aspect-[4/5] rounded-3xl overflow-hidden bg-brand-surface cursor-pointer ring-1 ring-white/5 hover:ring-brand-primary/30 shadow-2xl hover:shadow-brand-primary/10 opacity-0 translate-y-8 transition-all duration-700" data-id="${a.id}" data-title="${escHtml(a.title)}" data-desc="${escHtml(a.description || '')}">
         ${a.is_public ? privacyBadge : ''}
-        <span class="album-card-info">📷 ${date}</span>
         ${imgHtml}
-        <div class="album-card-overlay">
-          <div class="album-card-title">${escHtml(a.title)}</div>
-          ${a.description ? `<div class="album-card-desc">${escHtml(a.description)}</div>` : ''}
-          ${selCount > 0 ? `<div class="album-card-sel-badge">✅ ${selCount} đã chọn</div>` : ''}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-8 transition-all duration-500 group-hover:from-black">
+          <div class="font-display italic text-3xl font-light text-white leading-tight mb-2 group-hover:mb-4 transition-all duration-500">${escHtml(a.title)}</div>
+          <div class="h-0 group-hover:h-auto overflow-hidden opacity-0 group-hover:opacity-100 transition-all duration-500">
+             ${a.description ? `<div class="text-[11px] text-slate-500 font-mono tracking-wider uppercase truncate mb-4">${escHtml(a.description)}</div>` : ''}
+             <div class="flex items-center justify-between mt-2">
+                <span class="text-[10px] font-mono tracking-[0.2em] text-brand-primary uppercase">Xem bộ sưu tập</span>
+                ${selCount > 0 ? `<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-[9px] font-mono tracking-widest uppercase"><i data-lucide="check" class="w-2.5 h-2.5"></i> ${selCount} Đã chọn</div>` : ''}
+             </div>
+          </div>
         </div>
       </div>`;
   }).join('');
+  
+  // Reveal animation for albums
+  setTimeout(() => {
+    grid.querySelectorAll('.album-card').forEach((card, i) => {
+      setTimeout(() => {
+        card.classList.remove('opacity-0', 'translate-y-8');
+      }, i * 100);
+    });
+  }, 100);
+  
+  if (window.lucide) window.lucide.createIcons();
 
   grid.querySelectorAll('.album-card:not(.no-access)').forEach(card => {
     card.addEventListener('click', () =>
@@ -387,52 +422,50 @@ function renderPhotos(grid, append = false) {
     const shortName = (p.name || '').replace(/\.[^.]+$/, '');
     const stateLabelMap = { selected: '✅ Đã chọn', later: '⏳ Chọn sau', none: '—' };
     const card = document.createElement('div');
-    card.className = 'photo-item';
+    card.className = 'photo-item group';
     card.dataset.id = p.id;
     card.dataset.index = realIndex;
     card.innerHTML = `
       <img src="${escHtml(p.thumbnail || p.url)}" alt="${escHtml(p.name || '')}" loading="lazy"
            onerror="this.src='${escHtml(p.url)}'" />
-      <span class="list-photo-name" title="${escHtml(p.name || '')}">${escHtml(p.name || shortName)}</span>
-      <span class="list-photo-time">${
-        p.createdTime
-          ? new Date(p.createdTime).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
-          + (p.size ? ' · ' + (p.size >= 1048576 ? (p.size/1048576).toFixed(1)+' MB' : Math.round(p.size/1024)+' KB') : '')
-          : '—'
-      }</span>
-      <span class="list-state-badge state-${state}">${stateLabelMap[state] || '—'}</span>
-      <div class="photo-top-bar">
-        <div class="photo-top-bar-info">
-          <span class="photo-filename" title="${escHtml(p.name || '')}">${escHtml(shortName)}</span>
-          ${p.createdTime ? `<span class="photo-upload-time">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            ${new Date(p.createdTime).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })}
-            ${p.size ? '&middot; ' + (p.size >= 1048576 ? (p.size/1048576).toFixed(1) + ' MB' : Math.round(p.size/1024) + ' KB') : ''}
+      
+      <!-- Luxury Top Bar -->
+      <div class="photo-top-bar absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/60 to-transparent flex justify-between items-start opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <div class="flex flex-col gap-0.5 pointer-events-none">
+          <span class="font-mono text-[9px] tracking-[0.2em] uppercase text-white/90 font-bold" title="${escHtml(p.name || '')}">${escHtml(shortName)}</span>
+          ${p.createdTime ? `<span class="text-[8px] font-mono tracking-widest text-white/50 uppercase flex items-center gap-1">
+            <i data-lucide="clock" class="w-2.5 h-2.5"></i>
+            ${new Date(p.createdTime).toLocaleDateString('vi-VN')}
           </span>` : ''}
         </div>
-        <button class="photo-copy-btn" data-url="${escHtml(p.url)}" title="Copy link ảnh">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <button class="photo-copy-btn p-2 rounded-xl bg-white/5 hover:bg-white/20 text-white/80 transition-all duration-300 border border-white/5" data-url="${escHtml(p.url)}" title="Copy link ảnh">
+          <i data-lucide="link" class="w-3.5 h-3.5"></i>
         </button>
       </div>
-      <div class="photo-actions">
-        <button class="photo-expand-btn" data-index="${realIndex}" title="Xem to">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+
+      <!-- Luxury Bottom Actions -->
+      <div class="photo-actions absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+        <button class="photo-expand-btn w-9 h-9 rounded-2xl bg-white/5 hover:bg-white/20 flex items-center justify-center text-white/80 border border-white/10 backdrop-blur-xl transition-all" data-index="${realIndex}" title="Xem phóng to">
+          <i data-lucide="maximize-2" class="w-4 h-4"></i>
         </button>
-        <button class="pa-comment ${getPhotoComment(p.id) ? 'has-comment' : ''}" data-id="${p.id}" data-index="${realIndex}" title="Ghi chú / Yêu cầu chỉnh sửa">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Ghi chú
+        <button class="pa-comment ${getPhotoComment(p.id) ? 'bg-cyan-500 text-slate-900 border-cyan-400' : 'bg-white/5 hover:bg-white/20 text-white/80 border-white/10'} w-9 h-9 rounded-2xl flex items-center justify-center border backdrop-blur-xl transition-all" data-id="${p.id}" data-index="${realIndex}" title="Ghi chú chỉnh sửa">
+          <i data-lucide="message-square" class="w-4 h-4"></i>
         </button>
-        <button class="pa-later ${state === 'later' ? 'active' : ''}" data-id="${p.id}" title="Chọn sau">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Chọn sau
+        <button class="pa-later ${state === 'later' ? 'bg-amber-500 text-slate-900 border-amber-400' : 'bg-white/5 hover:bg-white/20 text-white/80 border-white/10'} w-9 h-9 rounded-2xl flex items-center justify-center border backdrop-blur-xl transition-all" data-id="${p.id}" title="Để ý sau">
+          <i data-lucide="clock" class="w-4 h-4"></i>
         </button>
-        <button class="pa-select ${state === 'selected' ? 'active' : ''}" data-id="${p.id}" title="Chọn ảnh này">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          Chọn
+        <button class="pa-select ${state === 'selected' ? 'bg-brand-primary text-white border-brand-primary/50' : 'bg-white text-slate-900 hover:bg-white/90 border-white'} px-4 h-9 rounded-2xl flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase border transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]" data-id="${p.id}" title="Chọn ảnh này">
+          <i data-lucide="${state === 'selected' ? 'check-circle' : 'circle'}" class="w-4 h-4"></i>
+          ${state === 'selected' ? 'Đã chọn' : 'Chọn ảnh'}
         </button>
       </div>`;
     applyCardState(card, state);
     grid.appendChild(card);
+    
+    // Reveal animation for photos
+    setTimeout(() => {
+       card.classList.add('reveal');
+    }, i * 30);
 
     // Events (only bound to to the newly created card)
     card.querySelector('img')?.addEventListener('click', () => {
@@ -483,6 +516,9 @@ function renderPhotos(grid, append = false) {
       loadMoreWrap.classList.add('hidden');
     }
   }
+
+  // Re-init Lucide icons for inline SVGs in generated HTML
+  if (window.lucide) window.lucide.createIcons();
 }
 
 // ─── Comment Modal ────────────────────────────────────────────────────────────
@@ -496,11 +532,13 @@ function openCommentModal(photoId, realIndex) {
   document.getElementById('comment-photo-state').textContent =
     s === 'selected' ? '✅ Đã chọn' : s === 'later' ? '⏳ Chọn sau' : '— Chưa chọn';
   document.getElementById('comment-input').value = getPhotoComment(photoId);
-  document.getElementById('comment-modal')?.classList.add('open');
+  if (window.openTailwindModal) openTailwindModal('comment-modal');
+  else document.getElementById('comment-modal')?.classList.add('open');
   setTimeout(() => document.getElementById('comment-input')?.focus(), 100);
 }
 function closeCommentModal() {
-  document.getElementById('comment-modal')?.classList.remove('open');
+  if (window.closeTailwindModal) closeTailwindModal('comment-modal');
+  else document.getElementById('comment-modal')?.classList.remove('open');
   commentPhotoId = null;
 }
 async function saveCommentAndClose() {
@@ -508,7 +546,7 @@ async function saveCommentAndClose() {
   const text = document.getElementById('comment-input')?.value || '';
   setPhotoComment(commentPhotoId, text);
   const card = document.querySelector(`.photo-item[data-id="${commentPhotoId}"]`);
-  card?.querySelector('.pa-comment')?.classList.toggle('has-comment', !!text.trim());
+  updateCommentBadge(card, text.trim());
 
   // Send to server if comment is non-empty
   if (text.trim() && currentAlbumId) {
@@ -534,11 +572,21 @@ function applyCardState(card, state) {
   card.classList.remove('state-selected', 'state-later', 'state-none');
   if (state === 'selected') card.classList.add('state-selected');
   else if (state === 'later') card.classList.add('state-later');
-  // Update buttons
+  // Update buttons - toggle Tailwind color classes
   const btnLater  = card.querySelector('.pa-later');
   const btnSelect = card.querySelector('.pa-select');
-  if (btnLater)  btnLater.classList.toggle('active', state === 'later');
-  if (btnSelect) btnSelect.classList.toggle('active', state === 'selected');
+  if (btnLater) {
+    btnLater.classList.toggle('active', state === 'later');
+    btnLater.classList.toggle('bg-amber-500', state === 'later');
+    btnLater.classList.toggle('text-white', state === 'later');
+    btnLater.classList.toggle('bg-white/10', state !== 'later');
+  }
+  if (btnSelect) {
+    btnSelect.classList.toggle('active', state === 'selected');
+    btnSelect.classList.toggle('bg-green-500', state === 'selected');
+    btnSelect.classList.toggle('text-white', state === 'selected');
+    btnSelect.classList.toggle('bg-white/10', state !== 'selected');
+  }
 }
 
 // ─── Toast (simple) ───────────────────────────────────────────────────────────
@@ -588,7 +636,13 @@ function showLbImage(idx) {
   
   if (btnSelect) btnSelect.classList.toggle('active', state === 'selected');
   if (btnLater) btnLater.classList.toggle('active', state === 'later');
-  if (btnComment) btnComment.classList.toggle('has-comment', !!getPhotoComment(photo.id));
+  if (btnComment) {
+    const hasNote = !!getPhotoComment(photo.id);
+    btnComment.classList.toggle('bg-cyan-500/20', hasNote);
+    btnComment.classList.toggle('text-cyan-400', hasNote);
+    btnComment.classList.toggle('border-cyan-500/30', hasNote);
+    btnComment.querySelector('i')?.classList.toggle('text-cyan-400', hasNote);
+  }
 }
 
 // ─── Submit selections ────────────────────────────────────────────────────────
@@ -598,12 +652,14 @@ async function submitSelections() {
   const confirmEl = document.getElementById('submit-confirm-overlay');
   const countEl = document.getElementById('submit-count');
   if (countEl) countEl.textContent = selected.length;
-  if (confirmEl) confirmEl.classList.add('open');
+  if (window.openTailwindModal) openTailwindModal('submit-confirm-overlay');
+  else if (confirmEl) confirmEl.classList.add('open');
 }
 async function doSubmit() {
   const selected = getSelectedPhotos();
   const overlay = document.getElementById('submit-confirm-overlay');
-  if (overlay) overlay.classList.remove('open');
+  if (window.closeTailwindModal) closeTailwindModal('submit-confirm-overlay');
+  else if (overlay) overlay.classList.remove('open');
   const btn = document.getElementById('btn-submit-sel');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Đang gửi...'; }
   try {
@@ -627,7 +683,8 @@ async function doSubmit() {
     const successOverlay = document.getElementById('submit-success-overlay');
     if (successOverlay) {
       document.getElementById('success-count').textContent = data.count;
-      successOverlay.classList.add('open');
+      if (window.openTailwindModal) openTailwindModal('submit-success-overlay');
+      else successOverlay.classList.add('open');
     }
   } catch (err) {
     showToast('❌ Lỗi: ' + err.message);
@@ -780,8 +837,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (decoded && decoded.email) {
         setSession(token, { email: decoded.email, name: decoded.name, picture: decoded.picture });
         history.replaceState(null, '', '/client');
-        hideLoader();
-        enterDashboard({ email: decoded.email, name: decoded.name, picture: decoded.picture });
+        if (sessionStorage.getItem('pending_album_id')) {
+          enterDashboard({ email: decoded.email, name: decoded.name, picture: decoded.picture });
+        } else {
+          window.location.href = '/';
+        }
         return;
       }
     }
@@ -800,19 +860,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetch(`${API_BASE}/me`, { headers: { 'Authorization': 'Bearer ' + token } })
       .then(r => r.ok ? r.json() : Promise.reject())
-      .then(serverUser => { 
+      .then(data => { 
         hideLoader(); 
+        const actualUser = data.user || data;
         // Use server user data (more reliable) but sync to local storage
-        localStorage.setItem('client_user', JSON.stringify(serverUser));
-        enterDashboard(serverUser); 
+        localStorage.setItem('client_user', JSON.stringify(actualUser));
+        enterDashboard(actualUser); 
       })
-      .catch(() => { clearSession(); hideLoader(); showScreen('login-screen'); });
+      .catch((err) => { 
+        console.error('Session validation failed:', err);
+        clearSession(); hideLoader(); showScreen('login-screen'); 
+      });
   } else {
     hideLoader(); showScreen('login-screen');
   }
 
   // ── Login button ───────────────────────────────────────────
   document.getElementById('btn-google-login')?.addEventListener('click', () => {
+    const params = new URLSearchParams(window.location.search);
+    const album = params.get('album');
+    if (album) {
+      sessionStorage.setItem('pending_album_id', album);
+    }
     window.location.href = '/api/client/auth/google';
   });
 
@@ -842,10 +911,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-submit-sel')?.addEventListener('click', submitSelections);
   document.getElementById('confirm-submit-btn')?.addEventListener('click', doSubmit);
   document.getElementById('cancel-submit-btn')?.addEventListener('click', () => {
-    document.getElementById('submit-confirm-overlay')?.classList.remove('open');
+    if (window.closeTailwindModal) closeTailwindModal('submit-confirm-overlay');
+    else document.getElementById('submit-confirm-overlay')?.classList.remove('open');
   });
   document.getElementById('close-success-btn')?.addEventListener('click', () => {
-    document.getElementById('submit-success-overlay')?.classList.remove('open');
+    if (window.closeTailwindModal) closeTailwindModal('submit-success-overlay');
+    else document.getElementById('submit-success-overlay')?.classList.remove('open');
   });
 
   // ── View Toggle (Grid / List) ───────────────────────────────
@@ -927,6 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('comment-save-btn')?.addEventListener('click', saveCommentAndClose);
   document.getElementById('comment-close-btn')?.addEventListener('click', closeCommentModal);
+  document.getElementById('comment-close-btn-2')?.addEventListener('click', closeCommentModal);
   document.getElementById('comment-modal')?.addEventListener('click', e => {
     if (e.target === document.getElementById('comment-modal')) closeCommentModal();
   });

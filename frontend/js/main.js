@@ -471,14 +471,55 @@ function initFooterYear() {
   if (el) el.textContent = new Date().getFullYear();
 }
 
+// ─── Client Navigation ────────────────────────────────────────────────────────
+function initClientNav() {
+  const token = localStorage.getItem('client_token');
+  let user = null;
+  try { user = JSON.parse(localStorage.getItem('client_user')); } catch (e) {}
+
+  const btnNav = $('#btn-client-nav');
+  const wrap = $('#client-dropdown-wrap');
+  
+  if (token && user) {
+    if (btnNav) btnNav.style.display = 'none';
+    if (wrap) wrap.style.display = 'flex';
+    
+    const avatarInfo = user.picture || '';
+    if (avatarInfo) {
+      $('#client-nav-avatar').src = avatarInfo;
+    } else {
+      $('#client-nav-avatar').src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+      $('#client-nav-avatar').style.padding = '4px';
+    }
+    
+    const menu = $('#client-dropdown-menu');
+    $('#btn-client-dropdown')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu?.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (!wrap?.contains(e.target)) menu?.classList.remove('active');
+    });
+    
+    $('#btn-client-logout')?.addEventListener('click', () => {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
+        localStorage.removeItem('client_token');
+        localStorage.removeItem('client_user');
+        window.location.reload();
+      }
+    });
+  }
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   initCursor();
   initNavbar();
   initLightbox();
   initProjectModal();
-  initFooterYear();
   initStatCounters();
+  initClientNav();
 
   // Add hero reveal delay classes
   $$('.hero-content .reveal-up').forEach((el, i) => {
