@@ -56,6 +56,136 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 300; font-style: ita
 @media (max-width: 1024px) { .photos-grid { columns: 3 240px; } }
 @media (max-width: 640px) { .photos-grid { columns: 2 160px; } }
 
+/* List View Support - Ultra Compact */
+.photos-grid.view-list {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+.photos-grid.view-list .photo-item {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  height: 48px;
+  padding: 0 16px;
+  width: 100%;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* faint separator */
+  margin-bottom: 0;
+  transition: background 0.2s;
+}
+.photos-grid.view-list .photo-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: none; /* disable hover lift */
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.05) !important; /* disable border glow */
+}
+.photos-grid.view-list .photo-item img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-right: 16px;
+}
+.photos-grid.view-list .photo-item:hover img {
+  transform: none;
+  filter: none;
+}
+/* Reformat top bar into list info */
+.photos-grid.view-list .photo-top-bar {
+  position: static !important;
+  background: transparent !important;
+  opacity: 1 !important;
+  flex: 1;
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 !important;
+  overflow: hidden;
+}
+/* Convert flex-col container to grid for Name and Date */
+.photos-grid.view-list .photo-top-bar > div:first-child {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+  pointer-events: auto !important;
+}
+/* Filename styling */
+.photos-grid.view-list .photo-top-bar span:first-child {
+  font-size: 13px !important;
+  font-family: var(--font-body) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-weight: 500 !important;
+  color: #e2e8f0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Date styling */
+.photos-grid.view-list .photo-top-bar span:last-child {
+  font-size: 13px !important;
+  color: #64748b !important;
+  letter-spacing: normal !important;
+  font-family: var(--font-body) !important;
+}
+.photos-grid.view-list .photo-top-bar span:last-child i {
+  display: none !important; /* Hide clock icon to match pure text */
+}
+
+.photos-grid.view-list .photo-copy-btn {
+  margin-left: 16px;
+  margin-right: 16px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #64748b !important;
+}
+
+/* Reformat actions */
+.photos-grid.view-list .photo-actions {
+  position: static !important;
+  background: transparent !important;
+  opacity: 1 !important;
+  transform: none !important;
+  flex-shrink: 0;
+  display: flex !important;
+  align-items: center;
+  padding: 0 !important;
+  gap: 8px;
+}
+.photos-grid.view-list .photo-expand-btn {
+  display: none !important;
+}
+.photos-grid.view-list .pa-comment,
+.photos-grid.view-list .pa-later {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+.photos-grid.view-list .pa-select {
+  height: 32px;
+  padding: 0 12px !important;
+  border-radius: 6px;
+  font-size: 11px !important;
+}
+@media (max-width: 640px) {
+  .photos-grid.view-list .photo-top-bar > div:first-child {
+    grid-template-columns: 1fr; /* Hide date on mobile */
+  }
+  .photos-grid.view-list .photo-top-bar span:last-child {
+    display: none !important;
+  }
+}
+
 .photo-item {
   break-inside: avoid; margin-bottom: 12px;
   position: relative; overflow: hidden;
@@ -173,3 +303,58 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 300; font-style: ita
 .delayed-2 { animation-delay: 0.2s; }
 .delayed-3 { animation-delay: 0.3s; }
 .delayed-4 { animation-delay: 0.4s; }
+
+/* ── Download Progress Toast ──────────────────────────────────── */
+.dl-progress-wrap {
+  position: fixed;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  width: 320px;
+  background: rgba(17, 20, 32, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  font-family: var(--font-body);
+  color: #fff;
+  animation: dl-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes dl-slide-up {
+  0% { transform: translateY(40px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.dl-progress-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.dl-progress-bar-wrap {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.dl-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+.dl-progress-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 640px) {
+  .dl-progress-wrap {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    left: 1.5rem;
+    width: auto;
+  }
+}
