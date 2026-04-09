@@ -353,17 +353,44 @@ async function loadServices() {
     if (!services.length) { grid.innerHTML = ''; return; }
     grid.innerHTML = '';
     services.forEach(s => {
-      const card = document.createElement('div');
-      card.className = 'service-card reveal-up';
-      card.innerHTML = `
-        <span class="service-icon">${s.icon || '📷'}</span>
-        <div class="service-name">${s.name}</div>
-        <p class="service-desc">${s.description || ''}</p>
-        <span class="service-arrow">Tìm hiểu thêm →</span>
+      const slide = document.createElement('div');
+      slide.className = 'swiper-slide';
+      slide.innerHTML = `
+        <div class="service-card" data-aos="fade-up" data-tilt data-tilt-max="8" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+          <span class="service-icon">${s.icon || '📷'}</span>
+          <div class="service-name">${s.name}</div>
+          <p class="service-desc">${s.description || ''}</p>
+          <span class="service-arrow">Tìm hiểu thêm →</span>
+        </div>
       `;
-      grid.appendChild(card);
+      grid.appendChild(slide);
     });
     initReveal();
+
+    // Init Tilt
+    if (window.VanillaTilt) {
+      window.VanillaTilt.init(document.querySelectorAll(".service-card"), {
+        reverse: true,
+      });
+    }
+
+    // Init Swiper
+    if (window.Swiper) {
+      new window.Swiper('#services-slider', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        grabCursor: true,
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        breakpoints: {
+          640: { slidesPerView: 2, spaceBetween: 20 },
+          1024: { slidesPerView: 3, spaceBetween: 30 },
+          1280: { slidesPerView: 4, spaceBetween: 30 },
+        }
+      });
+    }
   } catch (err) { console.warn('Services:', err); }
 }
 
@@ -397,8 +424,15 @@ async function loadAbout() {
       if (ph) ph.style.display = 'none';
     }
     // Social
-    if (data.instagram) { 
-      [$('#about-insta'), $('#c-insta'), $('#f-insta')].forEach(el => { if(el) el.href = data.instagram; }); 
+    // Social & Contact
+    if (data.phone) { 
+      // Zalo link requires stripping spaces from phone
+      const cleanPhone = data.phone.replace(/\s/g, '');
+      [$('#about-zalo'), $('#c-zalo'), $('#f-zalo')].forEach(el => { 
+        if (el) el.href = `https://zalo.me/${cleanPhone}`; 
+      }); 
+      $('#c-phone').href = `tel:${cleanPhone}`;
+      $('#c-phone-val').textContent = data.phone;
     }
     if (data.facebook)  { 
       [$('#about-fb'), $('#c-fb'), $('#f-fb')].forEach(el => { if(el) el.href = data.facebook; }); 
@@ -407,28 +441,20 @@ async function loadAbout() {
       [$('#about-email'), $('#c-email'), $('#f-email')].forEach(el => { if(el) el.href = `mailto:${data.email}`; }); 
       if ($('#c-email-val')) $('#c-email-val').textContent = data.email;
     }
-    if (data.phone) {
-      $('#c-phone').href = `tel:${data.phone.replace(/\s/g,'')}`;
-      $('#c-phone-val').textContent = data.phone;
-    }
 
   } catch (err) { console.warn('About:', err); }
 }
 
-// ─── Scroll Reveal ────────────────────────────────────────────────────────────
-const revealObs = new IntersectionObserver((entries) => {
-  entries.forEach((e, i) => {
-    if (e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('visible'), i * 80);
-      revealObs.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1 });
-
+// ─── Scroll Reveal (AOS) ──────────────────────────────────────────────────────
 function initReveal() {
-  $$('.reveal-up, .reveal-left, .reveal-right').forEach(el => {
-    if (!el.classList.contains('visible')) revealObs.observe(el);
-  });
+  if (window.AOS) {
+    window.AOS.init({
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: true,
+      offset: 50,
+    });
+  }
 }
 
 // ─── Counter animation ────────────────────────────────────────────────────────
