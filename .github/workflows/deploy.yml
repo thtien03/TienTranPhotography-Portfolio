@@ -15,7 +15,7 @@ jobs:
       with:
         fetch-depth: 0 
 
-    - name: 📂 Sync files tới Hostinger
+    - name: 📂 Sync Frontend (Giao Diện)
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
@@ -23,13 +23,26 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         protocol: ftps
         port: 21
+        local-dir: ./public_html/
+        server-dir: ./public_html/
         log-level: verbose
         exclude: |
-          **/.git*
           **/.git*/**
-          **/.github/**
+
+    - name: 📂 Sync Backend (Máy Chủ)
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        protocol: ftps
+        port: 21
+        local-dir: ./backend/
+        server-dir: ./backend/
+        log-level: verbose
+        exclude: |
+          **/.git*/**
+          **/.env
+          **/data/**
+          **/uploads/**
           **/node_modules/**
-          **/backend/.env
-          **/backend/data/**
-          **/backend/uploads/**
-          **/*.md
