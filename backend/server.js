@@ -10,6 +10,9 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust First Proxy (Hostinger Nginx Proxy)
+app.set('trust proxy', 1);
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 // Security headers
 app.use(helmet({
