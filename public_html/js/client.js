@@ -452,9 +452,9 @@ function renderPhotos(grid, append = false) {
         <button class="pa-later ${state === 'later' ? 'bg-amber-500 text-slate-900 border-amber-400' : 'bg-white/5 hover:bg-white/20 text-white/80 border-white/10'} w-9 h-9 rounded-2xl flex items-center justify-center border backdrop-blur-xl transition-all" data-id="${p.id}" title="Để ý sau">
           <i data-lucide="clock" class="w-4 h-4"></i>
         </button>
-        <button class="pa-select ${state === 'selected' ? 'bg-green-500 text-white border-green-500/50' : 'bg-white text-slate-900 hover:bg-white/90 border-white'} px-4 h-9 rounded-2xl flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase border transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]" data-id="${p.id}" title="Chọn ảnh này">
+        <button class="pa-select ${state === 'selected' ? 'bg-green-500 text-white border-green-500/50' : 'bg-white text-slate-900 hover:bg-white/90 border-white'} px-4 h-9 rounded-2xl flex items-center justify-center gap-1 sm:gap-2 font-mono text-[10px] tracking-widest uppercase border transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]" data-id="${p.id}" title="Chọn ảnh này">
           <i data-lucide="${state === 'selected' ? 'check-circle' : 'circle'}" class="w-4 h-4"></i>
-          ${state === 'selected' ? 'Đã chọn' : 'Chọn ảnh'}
+          <span class="hidden sm:inline">${state === 'selected' ? 'Đã chọn' : 'Chọn ảnh'}</span>
         </button>
       </div>`;
     applyCardState(card, state);
@@ -584,11 +584,11 @@ function applyCardState(card, state) {
   
   if (btnSelect) {
     if (state === 'selected') {
-      btnSelect.className = 'pa-select bg-green-500 text-white border-green-500/50 px-4 h-9 rounded-2xl flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase border transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]';
-      btnSelect.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Đã chọn';
+      btnSelect.className = 'pa-select bg-green-500 text-white border-green-500/50 px-4 h-9 rounded-2xl flex items-center justify-center gap-1 sm:gap-2 font-mono text-[10px] tracking-widest uppercase border transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]';
+      btnSelect.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> <span class="hidden sm:inline">Đã chọn</span>';
     } else {
-      btnSelect.className = 'pa-select bg-white text-slate-900 hover:bg-white/90 border-white px-4 h-9 rounded-2xl flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase border transition-all shadow-lg hover:scale-[1.02] active:scale-[0.98]';
-      btnSelect.innerHTML = '<i data-lucide="circle" class="w-4 h-4"></i> Chọn ảnh';
+      btnSelect.className = 'pa-select bg-white text-slate-900 hover:bg-white/90 border-white px-4 h-9 rounded-2xl flex items-center justify-center gap-1 sm:gap-2 font-mono text-[10px] tracking-widest uppercase border transition-all shadow-md hover:scale-[1.02] active:scale-[0.98]';
+      btnSelect.innerHTML = '<i data-lucide="circle" class="w-4 h-4"></i> <span class="hidden sm:inline">Chọn ảnh</span>';
     }
   }
 

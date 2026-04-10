@@ -371,19 +371,35 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 300; font-style: ita
 /* ── Photo items: always show actions on touch (mobile can't hover) ── */
 @media (max-width: 768px) {
   .photo-item { border-radius: 12px; margin-bottom: 8px; }
-  .photo-item:hover { transform: none; } /* Disable hover lift on mobile */
+  .photo-item:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,0.03); }
 
   /* Always show top bar and actions on mobile */
-  .photo-top-bar { opacity: 1 !important; }
+  .photo-top-bar { opacity: 1 !important; padding: 0.5rem !important; }
   .photo-actions {
     opacity: 1 !important;
     transform: translateY(0) !important;
-    background: rgba(8, 10, 17, 0.8) !important;
+    background: linear-gradient(to top, rgba(8, 10, 17, 0.9), transparent) !important;
+    padding: 0.5rem !important;
+    gap: 0.4rem !important;
   }
 
-  /* Bigger tap targets */
-  .pa-select { min-height: 34px; font-size: 10px !important; padding: 0 8px !important; }
-  .pa-comment, .pa-later { width: 34px !important; height: 34px !important; }
+  /* Make action buttons small and uniform so they don't cover the image */
+  .photo-expand-btn, .pa-comment, .pa-later, .pa-select {
+    width: 30px !important; 
+    height: 30px !important; 
+    min-height: 30px !important;
+    padding: 0 !important; 
+    border-radius: 8px !important;
+    backdrop-filter: blur(4px) !important; /* Lighter blur for perf */
+  }
+}
+
+/* ── Mobile Performance Utilities ── */
+@media (max-width: 640px) {
+  .glass-heavy {
+    backdrop-filter: blur(8px) !important; /* Reduce 24px blur to 8px on mobile */
+    background: rgba(17, 20, 32, 0.95); /* More opaque config to compensate */
+  }
 }
 
 /* ── Album Detail: main screen ── */

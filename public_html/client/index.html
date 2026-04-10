@@ -170,11 +170,11 @@
         <p class="text-slate-400 max-w-2xl mx-auto" id="album-desc"></p>
       </div>
 
-      <!-- Toolbar dính -->
-      <div class="sticky top-[57px] z-40 mb-6">
+      <!-- Toolbar (chỉ dính trên Desktop, ẩn khi cuộn trên Mobile) -->
+      <div class="relative sm:sticky sm:top-[64px] z-40 mb-6">
         <!-- Row 1: Filter Tabs + Counter -->
         <div class="glass-heavy rounded-2xl p-2 shadow-2xl border border-white/10 mb-2">
-          <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar" id="sel-filters">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-1" id="sel-filters">
             <button class="sel-tab active px-3 py-2 rounded-xl text-xs font-medium transition-all text-slate-400 hover:text-white hover:bg-white/5 whitespace-nowrap flex items-center gap-1.5" data-filter="all">
               <i data-lucide="layers" class="w-3.5 h-3.5 flex-shrink-0"></i> Tất cả
             </button>
