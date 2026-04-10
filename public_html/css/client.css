@@ -358,3 +358,116 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 300; font-style: ita
     width: auto;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLIENT PORTAL — Mobile Responsive Enhancements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Photos Grid ── */
+@media (max-width: 1024px) { .photos-grid { columns: 3 220px; } }
+@media (max-width: 768px)  { .photos-grid { columns: 2 160px; column-gap: 8px; } }
+@media (max-width: 480px)  { .photos-grid { columns: 2 130px; column-gap: 6px; } }
+
+/* ── Lightbox on Mobile ── */
+@media (max-width: 640px) {
+  .lb-stage { padding: 3.5rem 0.5rem 1rem; }
+  #lb-img { max-height: 65vh; border-radius: 8px; }
+  .lb-nav { width: 44px; height: 44px; border-radius: 12px; }
+  .lb-prev { left: 0.5rem; }
+  .lb-next { right: 0.5rem; }
+  .lb-close { top: 0.75rem; right: 0.75rem; width: 36px; height: 36px; border-radius: 10px; }
+
+  /* Toolbar stacks vertically */
+  .lb-toolbar {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  .lb-actions {
+    display: flex;
+    justify-content: space-around;
+  }
+  .lb-action-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 10px;
+  }
+  .lba-text { display: none; } /* Hide text labels in mobile lightbox */
+}
+
+/* ── Dashboard Header ── */
+@media (max-width: 640px) {
+  /* Dashboard title shrinks nicely */
+  #dashboard-screen main { padding: 4rem 1rem 3rem; }
+  #dashboard-screen .font-display { font-size: 3rem !important; }
+
+  /* Albums grid → single column on very small screens */
+  #albums-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Album Detail Toolbar ── */
+@media (max-width: 640px) {
+  /* Main toolbar wraps to 2 rows */
+  .glass-heavy.flex { flex-wrap: wrap; gap: 0.5rem; }
+
+  /* Filter tabs scroll horizontal */
+  #sel-filters { padding-bottom: 4px; }
+
+  /* Counter + download + submit row wraps onto 2nd row */
+  .flex.items-center.gap-3 { flex-wrap: wrap; gap: 0.5rem; }
+
+  /* Submit button: full label on mobile */
+  #btn-submit-sel { 
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  /* Download dropdown opens upward on small screens */
+  #dl-menu {
+    right: 0;
+    left: auto;
+    min-width: 200px;
+  }
+
+  /* Search/sort row becomes full-width stacked */
+  #photo-toolbar { flex-direction: column; gap: 0.5rem; }
+  #photo-toolbar > div { min-width: 100% !important; width: 100%; }
+
+  /* Photo items in masonry grid */
+  .photo-item { border-radius: 12px; }
+  .photo-actions { opacity: 1 !important; transform: none !important; }
+
+  /* Action buttons bigger tap targets */
+  .pa-select, .pa-comment, .pa-later {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* ── Album Detail main ── */
+@media (max-width: 640px) {
+  #album-screen main { padding: 1.5rem 1rem 4rem; }
+  #album-title { font-size: 2rem !important; }
+
+  /* Sticky toolbar: reduce top offset */
+  .sticky.top-\[64px\] { top: 56px; }
+}
+
+/* ── Toast notification ── */
+@media (max-width: 480px) {
+  .client-toast {
+    bottom: 5rem; /* avoid overlap with action buttons */
+    left: 1rem;
+    right: 1rem;
+    transform: translateX(0) translateY(20px);
+    border-radius: 16px;
+    text-align: center;
+  }
+  .client-toast.show {
+    transform: translateX(0) translateY(0);
+  }
+}
+
