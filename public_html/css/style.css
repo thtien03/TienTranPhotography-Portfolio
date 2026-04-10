@@ -123,9 +123,11 @@ ul {
   left: 0;
   pointer-events: none;
   z-index: 99999;
-  transform: translate(-50%, -50%);
-  transition: width .15s, height .15s, background .15s;
+  margin: -2.5px 0 0 -2.5px;
+  transform: translateZ(0);
+  transition: width .15s, height .15s, margin .15s, background .15s;
   mix-blend-mode: difference;
+  will-change: transform;
 }
 
 #cursor-ring {
@@ -138,19 +140,23 @@ ul {
   left: 0;
   pointer-events: none;
   z-index: 99998;
-  transform: translate(-50%, -50%);
-  transition: transform .1s var(--ease-out), width .3s, height .3s;
+  margin: -15px 0 0 -15px;
+  transform: translateZ(0);
+  transition: width .3s, height .3s, margin .3s;
   mix-blend-mode: difference;
+  will-change: transform;
 }
 
 body.cursor-hover #cursor-dot {
   width: 8px;
   height: 8px;
+  margin: -4px 0 0 -4px;
 }
 
 body.cursor-hover #cursor-ring {
   width: 46px;
   height: 46px;
+  margin: -23px 0 0 -23px;
 }
 
 /* ── Page Loader ────────────────────────────────────────────────────────── */

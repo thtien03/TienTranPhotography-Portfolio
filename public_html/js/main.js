@@ -28,15 +28,13 @@ function initCursor() {
 
   document.addEventListener('mousemove', (e) => {
     mx = e.clientX; my = e.clientY;
-    dot.style.left = mx + 'px';
-    dot.style.top  = my + 'px';
+    dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
   });
 
   function animRing() {
-    rx += (mx - rx) * 0.14;
-    ry += (my - ry) * 0.14;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
+    rx += (mx - rx) * 0.18; // Increased from 0.14 to 0.18 for better responsiveness
+    ry += (my - ry) * 0.18;
+    ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
     animId = requestAnimationFrame(animRing);
   }
   animRing();
