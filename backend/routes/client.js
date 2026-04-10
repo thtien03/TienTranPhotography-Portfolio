@@ -22,7 +22,11 @@ async function createSessionAndRedirect(res, email, name, picture) {
 // ─── GET /api/client/auth/google ─────────────────────────────────────────────
 // Bắt đầu luồng OAuth — redirect sang Google
 router.get('/auth/google', (req, res) => {
-  const redirectUri = `${req.protocol}://${req.get('host')}/api/client/auth/google/callback`;
+  // APP_URL từ env để override khi chạy sau proxy (Hostinger Nginx -> HTTP -> Node)
+  const baseUrl = process.env.APP_URL ||
+    `${req.protocol}://${req.get('host')}`;
+  const redirectUri = `${baseUrl}/api/client/auth/google/callback`;
+  console.log('[OAuth] redirect_uri:', redirectUri);
   const scope = 'openid email profile';
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GOOGLE_CLIENT_ID}` +
@@ -42,7 +46,9 @@ router.get('/auth/google/callback', async (req, res) => {
     return res.redirect('/client?error=auth_failed');
   }
   try {
-    const redirectUri = `${req.protocol}://${req.get('host')}/api/client/auth/google/callback`;
+    const baseUrl = process.env.APP_URL ||
+      `${req.protocol}://${req.get('host')}`;
+    const redirectUri = `${baseUrl}/api/client/auth/google/callback`;
     // Đổi code lấy tokens
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
