@@ -56,6 +56,8 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  overflow-x: hidden; /* Prevent any element from causing horizontal scroll */
+  max-width: 100%;
 }
 
 body {
@@ -63,9 +65,12 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
   line-height: 1.65;
   cursor: none;
   -webkit-font-smoothing: antialiased;
+  position: relative; /* Establish stacking context */
 }
 
 a {
@@ -392,6 +397,8 @@ body.cursor-hover #cursor-ring {
 /* ── Section Base ───────────────────────────────────────────────────────── */
 .section {
   padding: 120px 0 100px;
+  overflow: hidden; /* Contain child elements within section width */
+  max-width: 100%;
 }
 
 .section-container {
@@ -466,11 +473,13 @@ body.cursor-hover #cursor-ring {
   min-height: 620px;
   background: var(--black);
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* Prevent hero content from escaping */
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
   padding-bottom: 8vh;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Slides — desaturated under dark overlay */
@@ -707,10 +716,14 @@ body.cursor-hover #cursor-ring {
   gap: 0;
   margin-bottom: 3rem;
   border-bottom: 1px solid var(--border);
+  width: 100%;
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  /* Prevent filter-bar from contributing to page width */
+  box-sizing: border-box;
 }
 
 .filter-bar::-webkit-scrollbar {
@@ -984,8 +997,21 @@ body.cursor-hover #cursor-ring {
 
 .services-slider {
   width: 100%;
-  padding-bottom: 3rem; /* space for pagination */
+  max-width: 100%;
+  overflow: hidden; /* Critical: contain Swiper's internal overflow */
+  padding-bottom: 3rem;
   margin-top: 3rem;
+}
+
+/* Swiper wrapper containment */
+.services-slider .swiper-wrapper {
+  will-change: transform; /* Promote to GPU for correct clipping */
+}
+
+/* VanillaTilt glare containment */
+.js-tilt-glare {
+  border-radius: inherit;
+  overflow: hidden !important;
 }
 
 .service-card {
