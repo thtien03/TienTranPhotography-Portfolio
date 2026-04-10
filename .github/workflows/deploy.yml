@@ -1,1 +1,33 @@
+name: 🚀 Deploy Website to Hostinger FTP
 
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  web-deploy:
+    name: 🎉 Đẩy code lên Hostinger
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 
+
+    - name: 📂 Sync files tới Hostinger
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        log-level: verbose
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/.github/**
+          **/node_modules/**
+          **/backend/.env
+          **/backend/data/**
+          **/backend/uploads/**
+          **/*.md
