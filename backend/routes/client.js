@@ -90,7 +90,7 @@ function clientAuth(req, res, next) {
 }
 
 // ─── POST /api/client/auth ────────────────────────────────────────────────────
-// Nhận Google ID token từ frontend, xác thực và trả về JWT của riêng mình
+// Nhận Google ID token từ public_html, xác thực và trả về JWT của riêng mình
 router.post('/auth', async (req, res) => {
   try {
     const { credential } = req.body;
@@ -227,7 +227,7 @@ router.get('/albums/:id/photos', clientAuth, async (req, res) => {
       pageToken = driveData.nextPageToken;
     } while (pageToken);
 
-    // Chuyển đổi thành định dạng phù hợp cho frontend
+    // Chuyển đổi thành định dạng phù hợp cho public_html
     const photos = allFiles.map(file => {
       // Đảm bảo tên file luôn có extension đúng (một số file Drive không có extension)
       let name = file.name || file.id;

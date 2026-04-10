@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ─── Static Files ─────────────────────────────────────────────────────────────
-const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
+const FRONTEND_DIR = path.join(__dirname, '..', 'public_html');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // Ensure uploads dir exists
