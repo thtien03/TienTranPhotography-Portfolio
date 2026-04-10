@@ -185,8 +185,9 @@ body.cursor-hover #cursor-ring {
 
 /* Minimal loader: expanding + contracting lines */
 .loader-shutter {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   height: 32px;
   margin: 0 auto 1.25rem;
