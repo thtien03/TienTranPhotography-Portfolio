@@ -534,7 +534,7 @@ body.cursor-hover #cursor-ring {
 
 .hero-name {
   font-family: var(--font-display);
-  font-size: clamp(4rem, 11vw, 9rem);
+  font-size: clamp(3rem, 11vw, 9rem);
   font-weight: 300;
   font-style: italic;
   line-height: 0.9;
@@ -542,6 +542,11 @@ body.cursor-hover #cursor-ring {
   color: var(--white);
   margin-bottom: 2rem;
   transition-delay: .2s;
+  /* Prevent overflow on all screen sizes */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  hyphens: auto;
 }
 
 .hero-tagline {
@@ -1732,7 +1737,15 @@ body.cursor-hover #cursor-ring {
 
   /* ── Hero ── */
   .hero { min-height: 100svh; padding-bottom: 6vh; }
-  .hero-name { font-size: clamp(2.8rem, 13vw, 5rem); line-height: 0.95; }
+  .hero-content { padding: 0 1.25rem; }
+  .hero-name {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    line-height: 1;
+    letter-spacing: -.01em;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
   .hero-eyebrow { font-size: 0.6rem; }
   .hero-tagline { font-size: 0.9rem; margin-bottom: 1.5rem; }
   .hero-cats { gap: 0.75rem; font-size: 0.6rem; margin-bottom: 1.5rem; }
