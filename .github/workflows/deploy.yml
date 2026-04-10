@@ -24,7 +24,7 @@ jobs:
         protocol: ftps
         port: 21
         local-dir: ./public_html/
-        server-dir: ./public_html/
+        server-dir: ./
         log-level: verbose
         exclude: |
           **/.git*/**
@@ -38,7 +38,7 @@ jobs:
         protocol: ftps
         port: 21
         local-dir: ./backend/
-        server-dir: ./backend/
+        server-dir: ../backend/
         log-level: verbose
         exclude: |
           **/.git*/**
