@@ -107,16 +107,16 @@ function showConfirm(msg) {
     overlay.classList.add('open');
     const close = result => {
       overlay.classList.remove('open');
-      $('#confirm-delete-btn').removeEventListener('click', onY);
-      $('#confirm-cancel-btn').removeEventListener('click', onN);
-      $('#confirm-modal-close').removeEventListener('click', onN);
+      $('#confirm-delete-btn')?.removeEventListener('click', onY);
+      $('#confirm-cancel-btn')?.removeEventListener('click', onN);
+      $('#confirm-modal-close')?.removeEventListener('click', onN);
       resolve(result);
     };
     const onY = () => close(true);
     const onN = () => close(false);
-    $('#confirm-delete-btn').addEventListener('click', onY);
-    $('#confirm-cancel-btn').addEventListener('click', onN);
-    $('#confirm-modal-close').addEventListener('click', onN);
+    $('#confirm-delete-btn')?.addEventListener('click', onY);
+    $('#confirm-cancel-btn')?.addEventListener('click', onN);
+    $('#confirm-modal-close')?.addEventListener('click', onN);
   });
 }
 
