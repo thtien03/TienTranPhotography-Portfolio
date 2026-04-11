@@ -77,33 +77,16 @@ router.post('/upload', auth, upload.single('image'), async (req, res) => {
   }
 });
 
-// ─── Upload Hero (High Quality — no resize, quality 95) ──────────────────────
+// ─── Upload Hero (Bypass compression completely — perfect quality + no OOM crash) ───
 router.post('/upload-hero', auth, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
   try {
-    const ext = path.extname(req.file.originalname).toLowerCase();
-    const isSvg = ext === '.svg';
-    const isGif = ext === '.gif';
-    let finalFilename = req.file.filename;
-
-    if (!isSvg && !isGif) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      finalFilename = uniqueSuffix + '.webp';
-      const outputFilePath = path.join(UPLOADS_DIR, finalFilename);
-
-      // Hero: resize tối đa 3840px (4K), quality 95 — giữ ảnh nét sắc
-      await sharp(req.file.path)
-        .resize(3840, 3840, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 95, effort: 2 })
-        .toFile(outputFilePath);
-
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    }
-
+    // Keep the exact original file from Multer for Hero background
+    const finalFilename = req.file.filename;
     res.json({ url: `/uploads/${finalFilename}`, filename: finalFilename });
   } catch (error) {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    console.error('Sharp hero upload err:', error);
+    console.error('Bypass hero upload err:', error);
     res.status(500).json({ error: 'Failed to process hero image: ' + error.message });
   }
 });
