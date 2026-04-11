@@ -28,7 +28,7 @@ const upload = multer({
     if (/jpeg|jpg|png|gif|webp|svg/.test(path.extname(file.originalname).toLowerCase())) cb(null, true);
     else cb(new Error('Only image files allowed!'));
   },
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB for high-res photos
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB to allow large original hero shots
 });
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ router.post('/upload', auth, upload.single('image'), async (req, res) => {
     const isGif = ext === '.gif';
     let finalFilename = req.file.filename;
 
-    // Không nén svg hoặc gif (để giữ animation nếu có)
+    // Không nén svg hoặc gif
     if (!isSvg && !isGif) {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       finalFilename = uniqueSuffix + '.webp';
@@ -66,7 +66,6 @@ router.post('/upload', auth, upload.single('image'), async (req, res) => {
         .webp({ quality: 80, effort: 4 })
         .toFile(outputFilePath);
 
-      // Clean up original big file from disk
       if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     }
 
@@ -75,6 +74,37 @@ router.post('/upload', auth, upload.single('image'), async (req, res) => {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     console.error('Sharp upload err:', error);
     res.status(500).json({ error: 'Failed to process image: ' + error.message });
+  }
+});
+
+// ─── Upload Hero (High Quality — no resize, quality 95) ──────────────────────
+router.post('/upload-hero', auth, upload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+  try {
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const isSvg = ext === '.svg';
+    const isGif = ext === '.gif';
+    let finalFilename = req.file.filename;
+
+    if (!isSvg && !isGif) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      finalFilename = uniqueSuffix + '.webp';
+      const outputFilePath = path.join(UPLOADS_DIR, finalFilename);
+
+      // Hero: resize tối đa 3840px (4K), quality 95 — giữ ảnh nét sắc
+      await sharp(req.file.path)
+        .resize(3840, 3840, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 95, effort: 2 })
+        .toFile(outputFilePath);
+
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    }
+
+    res.json({ url: `/uploads/${finalFilename}`, filename: finalFilename });
+  } catch (error) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    console.error('Sharp hero upload err:', error);
+    res.status(500).json({ error: 'Failed to process hero image: ' + error.message });
   }
 });
 

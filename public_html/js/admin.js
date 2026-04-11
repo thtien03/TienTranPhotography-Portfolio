@@ -78,6 +78,31 @@ async function uploadImage(file, progressEl) {
   });
 }
 
+// Hero images skip compression entirely — upload 100% original file to maximize sharpness
+async function uploadHeroImage(file, progressEl) {
+  // Do NOT compress hero images — use original file as-is for maximum quality
+  const finalFile = file;
+  const formData = new FormData();
+  formData.append('image', finalFile);
+  const headers = { 'Authorization': `Bearer ${getToken()}` };
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    // Use dedicated hero upload endpoint: quality 95, max 3840px — no resize down
+    xhr.open('POST', `${API}/upload-hero`);
+    Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable && progressEl) progressEl.style.width = `${(e.loaded / e.total) * 100}%`;
+    };
+    xhr.onload = () => {
+      const data = JSON.parse(xhr.responseText);
+      if (xhr.status >= 200 && xhr.status < 300) resolve(data);
+      else reject(new Error(data.error || 'Upload failed'));
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.send(formData);
+  });
+}
+
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function showToast(msg, type = 'info') {
   const icons = { success: 'check-circle', error: 'alert-circle', info: 'info' };
@@ -1562,7 +1587,7 @@ function initHeroImagesLogic() {
     prog.style.width = '50%';
     try {
       showToast(`Đang tải lên ${files.length} ảnh nền...`, 'info');
-      const uploads = Array.from(files).filter(f => f.type.startsWith('image/')).map(f => uploadImage(f, null));
+      const uploads = Array.from(files).filter(f => f.type.startsWith('image/')).map(f => uploadHeroImage(f, null));
       const results = await Promise.all(uploads);
       for (const res of results) {
         if (res && res.url) {

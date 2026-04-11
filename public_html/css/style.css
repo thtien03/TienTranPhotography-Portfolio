@@ -269,7 +269,9 @@ body.cursor-hover #cursor-ring {
   right: 0;
   height: var(--nav-h);
   z-index: 1000;
-  transition: background var(--dur-med), border-bottom var(--dur-med);
+  /* Darker glass — clearly visible on hero image */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.25) 70%, transparent 100%);
+  transition: background var(--dur-med), border-bottom var(--dur-med), backdrop-filter var(--dur-med);
 }
 
 .navbar.scrolled {
@@ -308,6 +310,9 @@ body.cursor-hover #cursor-ring {
   height: 50px;
   width: auto;
   object-fit: contain;
+  /* Only subtle dark shadow to help logo stand out, no white glow */
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6));
+  transition: filter var(--dur-fast);
 }
 
 .nav-links {
@@ -509,7 +514,7 @@ body.cursor-hover #cursor-ring {
   background-position: center;
   opacity: 0;
   transition: opacity 2s ease;
-  filter: brightness(0.7) grayscale(0.1);
+  filter: brightness(0.92); /* Removed grayscale, raised brightness for vivid, sharp images */
 }
 
 .hero-slide.active {
@@ -520,7 +525,19 @@ body.cursor-hover #cursor-ring {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 10, 10, 0.85) 0%, rgba(10, 10, 10, 0.2) 50%, transparent 100%);
+  /* Top gradient keeps navbar/logo readable, bottom gradient keeps text readable */
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.05) 20%,
+    transparent 40%
+  ),
+  linear-gradient(
+    to top,
+    rgba(10, 10, 10, 0.65) 0%,
+    rgba(10, 10, 10, 0.1) 45%,
+    transparent 100%
+  );
 }
 
 .hero-slide-fallback {
