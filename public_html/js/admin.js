@@ -69,9 +69,10 @@ async function uploadImage(file, progressEl) {
       if (e.lengthComputable && progressEl) progressEl.style.width = `${(e.loaded / e.total) * 100}%`;
     };
     xhr.onload = () => {
-      const data = JSON.parse(xhr.responseText);
+      let data;
+      try { data = JSON.parse(xhr.responseText); } catch(e) { return reject(new Error('Server error: ' + (xhr.status === 413 ? 'Dung lượng ảnh vượt giới hạn máy chủ' : xhr.responseText.substring(0,50)))); }
       if (xhr.status >= 200 && xhr.status < 300) resolve(data);
-      else reject(new Error(data.error || 'Upload failed'));
+      else reject(new Error(data?.error || 'Upload failed'));
     };
     xhr.onerror = () => reject(new Error('Network error'));
     xhr.send(formData);
@@ -94,9 +95,10 @@ async function uploadHeroImage(file, progressEl) {
       if (e.lengthComputable && progressEl) progressEl.style.width = `${(e.loaded / e.total) * 100}%`;
     };
     xhr.onload = () => {
-      const data = JSON.parse(xhr.responseText);
+      let data;
+      try { data = JSON.parse(xhr.responseText); } catch(e) { return reject(new Error('Server error: ' + (xhr.status === 413 ? 'Dung lượng ảnh vượt giới hạn máy chủ' : xhr.responseText.substring(0,50)))); }
       if (xhr.status >= 200 && xhr.status < 300) resolve(data);
-      else reject(new Error(data.error || 'Upload failed'));
+      else reject(new Error(data?.error || 'Upload failed'));
     };
     xhr.onerror = () => reject(new Error('Network error'));
     xhr.send(formData);
