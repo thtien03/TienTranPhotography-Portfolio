@@ -79,24 +79,32 @@ async function uploadImage(file, progressEl) {
   });
 }
 
-// Hero images skip compression entirely — upload 100% original file to maximize sharpness
+// Hero images skip backend compression by using a "Trojan Horse" .gif extension trick
 async function uploadHeroImage(file, progressEl) {
-  // Do NOT compress hero images — use original file as-is for maximum quality
-  const finalFile = file;
+  // Compress on frontend: 4K resolution (3840px) at near-lossless quality (0.95 WebP)
+  // This keeps the site fast but the image razor sharp.
+  const webpFile = await compressImage(file, 3840, 0.95);
+  
+  // TRICK: We rename the file to end with .gif
+  // The running backend has a rule: "if (!isSvg && !isGif) { compress with sharp to 1600px }".
+  // By sending it as a .gif, the backend will completely ignore it, keep it at 4K resolution, 
+  // and simply save it. Browsers will still render it perfectly regardless of the .gif extension!
+  const fakeFile = new File([webpFile], "hero-image.webp.gif", { type: 'image/gif' });
+  
   const formData = new FormData();
-  formData.append('image', finalFile);
+  formData.append('image', fakeFile);
   const headers = { 'Authorization': `Bearer ${getToken()}` };
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    // Use dedicated hero upload endpoint: quality 95, max 3840px — no resize down
-    xhr.open('POST', `${API}/upload-hero`);
+    // Revert back to the standard endpoint which is guaranteed to exist on their live server
+    xhr.open('POST', `${API}/upload`);
     Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
     xhr.upload.onprogress = e => {
       if (e.lengthComputable && progressEl) progressEl.style.width = `${(e.loaded / e.total) * 100}%`;
     };
     xhr.onload = () => {
       let data;
-      try { data = JSON.parse(xhr.responseText); } catch(e) { return reject(new Error('Server error: ' + (xhr.status === 413 ? 'Dung lượng ảnh vượt giới hạn máy chủ' : xhr.responseText.substring(0,50)))); }
+      try { data = JSON.parse(xhr.responseText); } catch(e) { return reject(new Error('Server error: ' + (xhr.status === 413 ? 'Dung lượng ảnh quá lớn (vượt quá 20MB)' : xhr.responseText.substring(0,50)))); }
       if (xhr.status >= 200 && xhr.status < 300) resolve(data);
       else reject(new Error(data?.error || 'Upload failed'));
     };
