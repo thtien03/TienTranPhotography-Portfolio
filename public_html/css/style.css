@@ -310,6 +310,25 @@ body.cursor-hover #cursor-ring {
   height: 50px;
   width: auto;
   object-fit: contain;
+  transition: filter var(--dur-med);
+}
+
+/* On transparent navbar (dark hero background): Logo and Text must be white */
+.navbar:not(.scrolled) .nav-logo-img {
+  filter: invert(1) brightness(2);
+}
+
+.navbar:not(.scrolled) .nav-link {
+  color: rgba(255,255,255,0.85);
+}
+
+.navbar:not(.scrolled) .nav-link:hover,
+.navbar:not(.scrolled) .nav-link.active {
+  color: var(--white);
+}
+
+.navbar:not(.scrolled) .nav-link::after {
+  background: var(--white);
 }
 
 .nav-links {
