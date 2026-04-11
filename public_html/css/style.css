@@ -277,6 +277,14 @@ body.cursor-hover #cursor-ring {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  will-change: background-color, backdrop-filter;
+}
+
+@media (max-width: 768px) {
+  .navbar.scrolled {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
 }
 
 .nav-inner {

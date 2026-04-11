@@ -17,13 +17,26 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
 
-  <!-- Preload Banner Script -->
+  <!-- Preload Banner Script with LocalStorage Cache for Instant LCP -->
+  <style id="hero-cache-style"></style>
   <script>
+    const cachedHero = localStorage.getItem('heroImage');
+    if (cachedHero) {
+      const link = document.createElement('link');
+      link.rel = 'preload'; link.as = 'image'; link.href = cachedHero; link.fetchPriority = 'high';
+      document.head.appendChild(link);
+      document.getElementById('hero-cache-style').textContent = `.hero-slide-fallback { background-image: url('${cachedHero}') !important; }`;
+    }
     fetch('/api/hero').then(res => res.json()).then(data => {
       if (data && data[0] && data[0].image_url) {
-        const link = document.createElement('link');
-        link.rel = 'preload'; link.as = 'image'; link.href = data[0].image_url;
-        document.head.appendChild(link);
+        if (!cachedHero || cachedHero !== data[0].image_url) {
+          localStorage.setItem('heroImage', data[0].image_url);
+          if (!cachedHero) {
+            const link = document.createElement('link');
+            link.rel = 'preload'; link.as = 'image'; link.href = data[0].image_url; link.fetchPriority = 'high';
+            document.head.appendChild(link);
+          }
+        }
       }
     }).catch(()=>{});
   </script>

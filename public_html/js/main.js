@@ -11,14 +11,18 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
 // ─── Page Loader ──────────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
+  // Reduced artificial delay from 800ms to 20ms to significantly boost FCP/LCP Lighthouse scores.
   setTimeout(() => {
     $('#page-loader')?.classList.add('hidden');
     initReveal();
-  }, 800);
+  }, 20);
 });
 
 // ─── Custom Cursor ────────────────────────────────────────────────────────────
 function initCursor() {
+  // Disable costly custom cursor JS calculating on mobile touch devices to save CPU and battery
+  if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) return;
+
   const dot = $('#cursor-dot');
   const ring = $('#cursor-ring');
   if (!dot || !ring) return;
@@ -63,7 +67,7 @@ function initNavbar() {
       if (window.scrollY >= s.offsetTop - 120) current = s.id;
     });
     links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${current}`));
-  });
+  }, { passive: true });
 
   hamburger?.addEventListener('click', () => navLinks?.classList.toggle('open'));
   links.forEach(l => l.addEventListener('click', () => navLinks?.classList.remove('open')));
