@@ -310,9 +310,6 @@ body.cursor-hover #cursor-ring {
   height: 50px;
   width: auto;
   object-fit: contain;
-  /* Only subtle dark shadow to help logo stand out, no white glow */
-  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6));
-  transition: filter var(--dur-fast);
 }
 
 .nav-links {
