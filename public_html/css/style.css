@@ -874,14 +874,23 @@ body.cursor-hover #cursor-ring {
 }
 
 .photo-card {
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
   break-inside: avoid;
   margin-bottom: 8px;
   position: relative;
   overflow: hidden;
-  display: block;
+  display: inline-block; /* Inline-block instead of block drastically improves Safari stability */
+  width: 100%;
   background: var(--grey-100);
   cursor: none;
   animation: fadeIn .6s var(--ease) both;
+  
+  /* Safari Rendering Bugs Fix: Force GPU acceleration to prevent masonry flickering during hover transition */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 @keyframes fadeIn {
