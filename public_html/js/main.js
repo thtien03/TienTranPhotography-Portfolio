@@ -153,8 +153,8 @@ async function loadGallery() {
 
   try {
     const [cats, photos] = await Promise.all([
-      fetchJSON('/api/categories'),
-      fetchJSON('/api/photos')
+      fetchJSON('/api/categories').catch(e => { console.warn('Categories failed:', e); return [{identifier: 'All', display_name: 'Tất Cả'}]; }),
+      fetchJSON('/api/photos').catch(e => { console.warn('Photos failed:', e); return []; })
     ]);
     
     allPhotos = photos;
@@ -529,6 +529,10 @@ function initStatCounters() {
 async function fetchJSON(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("text/html")) {
+    throw new Error(`Expected JSON but received HTML from ${url}. The backend route might be missing or node needs a restart.`);
+  }
   return res.json();
 }
 
