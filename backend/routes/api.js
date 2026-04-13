@@ -16,7 +16,8 @@ router.get('/about', async (req, res) => {
 router.get('/photos', async (req, res) => {
   try {
     const { category, featured } = req.query;
-    let query = 'SELECT * FROM photos WHERE visible = 1';
+    // Only fetch photos whose category is visible in the categories table
+    let query = 'SELECT * FROM photos WHERE visible = 1 AND category IN (SELECT identifier FROM categories WHERE visible = 1)';
     const params = [];
 
     if (category && category !== 'All') {
@@ -40,11 +41,12 @@ router.get('/photos', async (req, res) => {
   }
 });
 
-// GET /api/photos/categories
-router.get('/photos/categories', async (req, res) => {
+// GET /api/categories
+router.get('/categories', async (req, res) => {
   try {
-    const rows = await db.allAsync('SELECT DISTINCT category FROM photos WHERE visible = 1');
-    res.json(['All', ...rows.map(r => r.category)]);
+    const rows = await db.allAsync('SELECT identifier, display_name FROM categories WHERE visible = 1 ORDER BY order_index ASC');
+    // Prepend 'All' automatically
+    res.json([{ identifier: 'All', display_name: 'Tất Cả' }, ...rows]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

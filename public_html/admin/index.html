@@ -131,6 +131,11 @@
             <span class="text-sm font-medium">Dịch vụ</span>
             <span class="ml-auto bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded-full font-bold" id="services-count">0</span>
           </div>
+          <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="categories" id="nav-categories">
+            <i data-lucide="tags" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+            <span class="text-sm font-medium">Thể loại</span>
+            <span class="ml-auto bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded-full font-bold" id="categories-count">0</span>
+          </div>
           <div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 group" data-tab="client-albums" id="nav-client-albums">
             <i data-lucide="users" class="w-5 h-5 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
             <span class="text-sm font-medium">Album Khách Hàng</span>
@@ -595,6 +600,38 @@
   </div>
 </div>
 
+      <!-- ── CATEGORIES ── -->
+      <div id="tab-categories" class="tab-panel space-y-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-extrabold tracking-tight">Quản lý Thể loại</h2>
+            <p class="text-sm text-slate-400 mt-1">Bật/tắt hiển thị thể loại ảnh trên trang chủ Gallery</p>
+          </div>
+        </div>
+
+        <div class="glass-heavy rounded-2xl border border-white/5 overflow-hidden shadow-xl">
+          <div class="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
+            <h3 class="font-bold">Danh sách Thể loại</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-slate-400 font-bold uppercase tracking-widest bg-white/5">
+                <tr>
+                  <th class="px-6 py-4">Mã (ID)</th>
+                  <th class="px-6 py-4">Tên hiển thị</th>
+                  <th class="px-6 py-4 border-l border-white/5 text-center">Trạng thái (Hiển thị)</th>
+                </tr>
+              </thead>
+              <tbody id="categories-list-body" class="divide-y divide-white/5">
+                <tr>
+                   <td colspan="3" class="px-6 py-10 text-center text-slate-400">Đang tải danh sách...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
 <div class="modal-overlay-admin" id="client-album-modal-overlay">
   <div class="modal-dialog w-full max-w-xl max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true">
     <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-brand-surface/80 backdrop-blur-xl z-10">
@@ -779,6 +816,6 @@
     lucide.createIcons();
   });
 </script>
-<script src="/js/admin.js?v=7.9"></script>
+<script src="/js/admin.js?v=8.0"></script>
 </body>
 </html>

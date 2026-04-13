@@ -152,7 +152,22 @@ async function loadGallery() {
   if (!grid) return;
 
   try {
-    allPhotos = await fetchJSON('/api/photos');
+    const [cats, photos] = await Promise.all([
+      fetchJSON('/api/categories'),
+      fetchJSON('/api/photos')
+    ]);
+    
+    allPhotos = photos;
+    
+    // Build filter bar dynamically
+    const filterBar = $('#filter-bar');
+    if (filterBar) {
+      filterBar.innerHTML = cats.map(c => 
+        `<button class="filter-btn whitespace-nowrap ${c.identifier === 'All' ? 'active' : ''}" data-filter="${c.identifier}" role="tab" aria-selected="${c.identifier === 'All'}">${c.display_name}</button>`
+      ).join('');
+      // Reveal the filter bar once loaded
+      filterBar.classList.remove('opacity-0');
+    }
 
     // Update stat
     const statPhotos = $('#stat-photos');

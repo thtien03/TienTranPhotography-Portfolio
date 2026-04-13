@@ -93,7 +93,43 @@ db.exec(`
     cover_image TEXT DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    identifier TEXT UNIQUE NOT NULL,
+    display_name TEXT NOT NULL,
+    visible INTEGER DEFAULT 1,
+    order_index INTEGER DEFAULT 0
+  );
 `);
+
+// ─── Auto-Seed Default Categories ─────────────────────────────────────────────
+(function seedCategories() {
+  try {
+    const { count } = db.getAsync("SELECT COUNT(*) AS count FROM categories");
+    // Only seed if Promise resolved immediately or via synchronous prepare (node:sqlite is sync)
+  } catch (e) {
+    // node:sqlite returns objects directly for synchronous queries if not using promise wrapper
+    const stmt = db.prepare("SELECT COUNT(*) AS c FROM categories");
+    const count = stmt.get().c;
+    
+    if (count === 0) {
+      const defaults = [
+        ['All', 'Tất Cả', 1, 0],
+        ['Wedding', 'Cưới Hỏi', 1, 1],
+        ['Portrait', 'Chân Dung', 1, 2],
+        ['Event', 'Sự Kiện', 1, 3],
+        ['Product', 'Sản Phẩm', 1, 4]
+      ];
+      
+      const insertStmt = db.prepare('INSERT INTO categories (identifier, display_name, visible, order_index) VALUES (?, ?, ?, ?)');
+      defaults.forEach(cat => {
+        insertStmt.run(...cat);
+      });
+      console.log('Seeded default categories');
+    }
+  }
+})();
 
 // ─── Migrations ───────────────────────────────────────────────────────────────
 try {

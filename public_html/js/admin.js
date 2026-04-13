@@ -158,7 +158,7 @@ function showConfirm(msg) {
 // ─── Navigation ───────────────────────────────────────────────────────────────
 const TAB_TITLES = {
   dashboard: 'Dashboard', hero: 'Hình nền', photos: 'Quản lý ảnh', about: 'Thông tin cá nhân',
-  services: 'Dịch vụ', 'client-albums': 'Client Albums', settings: 'Đổi mật khẩu'
+  services: 'Dịch vụ', categories: 'Thể loại', 'client-albums': 'Client Albums', settings: 'Đổi mật khẩu'
 };
 function switchTab(tab) {
   $$('.nav-item').forEach(n => n.classList.remove('active'));
@@ -170,6 +170,7 @@ function switchTab(tab) {
   if (tab === 'photos') loadPhotos();
   if (tab === 'about') loadAbout();
   if (tab === 'services') loadServices();
+  if (tab === 'categories') loadCategories();
   if (tab === 'dashboard') loadDashboard();
   if (tab === 'client-albums') loadClientAlbums();
 }
@@ -244,6 +245,46 @@ async function loadDashboard() {
     }
   } catch (err) { console.warn(err); }
 }
+
+// ─── CATEGORIES ───────────────────────────────────────────────────────────────
+async function loadCategories() {
+  try {
+    const list = await apiRequest('GET', '/categories');
+    const tbody = $('#categories-list-body');
+    const countEl = $('#categories-count');
+    if(countEl) countEl.textContent = list.length;
+    
+    if(!list.length) {
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center p-8 text-slate-500">Chưa có thể loại nào</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = list.map(c => `
+      <tr class="hover:bg-white/5 transition-colors">
+        <td class="px-6 py-4 font-mono text-xs text-brand-primary uppercase tracking-widest">${c.identifier}</td>
+        <td class="px-6 py-4 font-bold text-white">${c.display_name}</td>
+        <td class="px-6 py-4 border-l border-white/5 text-center">
+          <label class="relative inline-flex items-center cursor-pointer ${c.identifier === 'All' ? 'opacity-50 pointer-events-none' : ''}" title="${c.identifier === 'All' ? 'Không thể ẩn Tất cả' : ''}">
+            <input type="checkbox" class="sr-only peer" ${c.visible ? 'checked' : ''} onchange="toggleCategory('${c.identifier}', this.checked)">
+            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+          </label>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+window.toggleCategory = async (id, checked) => {
+  try {
+    await apiRequest('PUT', `/categories/${id}/toggle`);
+    showToast(`Đã ${checked ? 'hiển thị' : 'ẩn'} thể loại ${id}`, 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+    loadCategories(); // Revert toggle visually
+  }
+};
 
 // ─── PHOTOS ───────────────────────────────────────────────────────────────────
 let photosList = [];

@@ -210,6 +210,26 @@ router.put('/about', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ─── Categories ───────────────────────────────────────────────────────────────
+router.get('/categories', auth, async (req, res) => {
+  try {
+    const categories = await db.allAsync('SELECT * FROM categories ORDER BY order_index ASC');
+    res.json(categories);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.put('/categories/:identifier/toggle', auth, async (req, res) => {
+  try {
+    const existing = await db.getAsync('SELECT * FROM categories WHERE identifier = ?', [req.params.identifier]);
+    if (!existing) return res.status(404).json({ error: 'Category not found.' });
+    if (existing.identifier === 'All') return res.status(400).json({ error: 'Không thể ẩn danh mục Tất cả.' });
+    
+    const newVisible = existing.visible ? 0 : 1;
+    await db.runAsync('UPDATE categories SET visible = ? WHERE identifier = ?', [newVisible, req.params.identifier]);
+    res.json({ success: true, visible: newVisible });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // ─── Services ─────────────────────────────────────────────────────────────────
 router.get('/services', auth, async (req, res) => {
   try {
