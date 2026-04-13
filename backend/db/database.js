@@ -106,10 +106,6 @@ db.exec(`
 // ─── Auto-Seed Default Categories ─────────────────────────────────────────────
 (function seedCategories() {
   try {
-    const { count } = db.getAsync("SELECT COUNT(*) AS count FROM categories");
-    // Only seed if Promise resolved immediately or via synchronous prepare (node:sqlite is sync)
-  } catch (e) {
-    // node:sqlite returns objects directly for synchronous queries if not using promise wrapper
     const stmt = db.prepare("SELECT COUNT(*) AS c FROM categories");
     const count = stmt.get().c;
     
@@ -128,6 +124,8 @@ db.exec(`
       });
       console.log('Seeded default categories');
     }
+  } catch (e) {
+    console.error('Failed to seed categories:', e);
   }
 })();
 

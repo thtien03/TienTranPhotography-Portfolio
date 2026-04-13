@@ -247,9 +247,12 @@ async function loadDashboard() {
 }
 
 // ─── CATEGORIES ───────────────────────────────────────────────────────────────
+let _categoriesData = [];
+
 async function loadCategories() {
   try {
     const list = await apiRequest('GET', '/categories');
+    _categoriesData = list;
     const tbody = $('#categories-list-body');
     const countEl = $('#categories-count');
     if(countEl) countEl.textContent = list.length;
@@ -269,8 +272,16 @@ async function loadCategories() {
             <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
           </label>
         </td>
+        <td class="px-6 py-4 text-right whitespace-nowrap">
+          <button class="w-8 h-8 inline-flex items-center justify-center rounded-lg hover:bg-green-500/20 text-green-400 transition-colors mr-2" onclick="shareCategory('${c.identifier}')" title="Copy Link Chia Sẻ"><i data-lucide="link" class="w-4 h-4"></i></button>
+          ${c.identifier !== 'All' ? `
+            <button class="w-8 h-8 inline-flex items-center justify-center rounded-lg hover:bg-brand-primary/20 text-brand-primary transition-colors" onclick="editCategory('${c.identifier}')" title="Sửa"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+            <button class="w-8 h-8 inline-flex items-center justify-center rounded-lg hover:bg-red-500/20 text-red-500 transition-colors" onclick="deleteCategory('${c.identifier}')" title="Xoá"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          ` : '<span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Hệ thống</span>'}
+        </td>
       </tr>
     `).join('');
+    lucide.createIcons();
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -285,6 +296,85 @@ window.toggleCategory = async (id, checked) => {
     loadCategories(); // Revert toggle visually
   }
 };
+
+window.shareCategory = (id) => {
+  const url = window.location.origin + (id === 'All' ? '/' : `/?category=${encodeURIComponent(id)}#gallery`);
+  navigator.clipboard.writeText(url).then(() => {
+    showToast(`Đã copy link chia sẻ danh mục: ${id}`, 'success');
+  }).catch(() => {
+    prompt('Link chia sẻ:', url);
+  });
+};
+
+window.editCategory = (id) => {
+  const cat = _categoriesData.find(c => c.identifier === id);
+  if (!cat) return;
+  $('#cat-edit-mode').value = 'true';
+  $('#cat-id').value = cat.identifier;
+  $('#cat-id').readOnly = true;
+  $('#cat-id').classList.add('opacity-50');
+  $('#cat-name').value = cat.display_name;
+  $('#cat-order').value = cat.order_index;
+  $('#cat-modal-heading').textContent = 'Sửa Thể loại';
+  $('#category-modal-overlay').classList.add('open');
+};
+
+window.deleteCategory = async (id) => {
+  if (await showConfirm(`Bạn có chắc chắn muốn xoá thể loại '${id}'? Các ảnh thuộc danh mục này sẽ tạm thời bị mất danh mục.`)) {
+    try {
+      await apiRequest('DELETE', `/categories/${id}`);
+      showToast('Đã xóa', 'success');
+      loadCategories();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+};
+
+$('#btn-add-category')?.addEventListener('click', () => {
+  $('#cat-edit-mode').value = 'false';
+  $('#cat-id').value = '';
+  $('#cat-id').readOnly = false;
+  $('#cat-id').classList.remove('opacity-50');
+  $('#cat-name').value = '';
+  $('#cat-order').value = '0';
+  $('#cat-modal-heading').textContent = 'Thêm Thể loại';
+  $('#category-modal-overlay').classList.add('open');
+});
+
+$('#cat-modal-close')?.addEventListener('click', () => $('#category-modal-overlay').classList.remove('open'));
+$('#cat-cancel-btn')?.addEventListener('click', () => $('#category-modal-overlay').classList.remove('open'));
+
+$('#cat-save-btn')?.addEventListener('click', async () => {
+  const isEdit = $('#cat-edit-mode').value === 'true';
+  const id = $('#cat-id').value.trim();
+  const name = $('#cat-name').value.trim();
+  const order = $('#cat-order').value;
+  
+  if (!id || !name) return showToast('Vui lòng nhập mã và tên thể loại', 'error');
+  
+  try {
+    const btn = $('#cat-save-btn');
+    btn.disabled = true; btn.innerHTML = '<div class="spinner border-t-brand-primary border-2 w-4 h-4 rounded-full animate-spin"></div>';
+    
+    if (isEdit) {
+      await apiRequest('PUT', `/categories/${id}`, { display_name: name, order_index: parseInt(order)||0 });
+      showToast('Cập nhật thành công', 'success');
+    } else {
+      await apiRequest('POST', `/categories`, { identifier: id, display_name: name, order_index: parseInt(order)||0 });
+      showToast('Thêm thành công', 'success');
+    }
+    
+    $('#category-modal-overlay').classList.remove('open');
+    loadCategories();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    const btn = $('#cat-save-btn');
+    btn.disabled = false; btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Lưu dữ liệu';
+    lucide.createIcons();
+  }
+});
 
 // ─── PHOTOS ───────────────────────────────────────────────────────────────────
 let photosList = [];

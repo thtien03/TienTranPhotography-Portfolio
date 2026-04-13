@@ -230,6 +230,55 @@ router.put('/categories/:identifier/toggle', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+router.post('/categories', auth, async (req, res) => {
+  try {
+    const { identifier, display_name, order_index } = req.body;
+    if (!identifier || !display_name) return res.status(400).json({ error: 'Identifier and display name are required.' });
+    if (identifier === 'All') return res.status(400).json({ error: 'Cannot create category with identifier "All".' });
+    
+    // Check if identifier already exists
+    const existing = await db.getAsync('SELECT * FROM categories WHERE identifier = ?', [identifier]);
+    if (existing) return res.status(400).json({ error: 'Mã thể loại này đã tồn tại.' });
+
+    const result = await db.runAsync(
+      'INSERT INTO categories (identifier, display_name, visible, order_index) VALUES (?,?,?,?)',
+      [identifier, display_name, 1, order_index || 0]
+    );
+    const category = await db.getAsync('SELECT * FROM categories WHERE id = ?', [result.lastInsertRowid]);
+    res.status(201).json(category);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.put('/categories/:identifier', auth, async (req, res) => {
+  try {
+    const existing = await db.getAsync('SELECT * FROM categories WHERE identifier = ?', [req.params.identifier]);
+    if (!existing) return res.status(404).json({ error: 'Category not found.' });
+    if (existing.identifier === 'All') return res.status(400).json({ error: 'Không thể sửa danh mục Tất cả.' });
+    
+    const { display_name, order_index } = req.body;
+    await db.runAsync(
+      'UPDATE categories SET display_name = ?, order_index = ? WHERE identifier = ?',
+      [display_name || existing.display_name, order_index !== undefined ? order_index : existing.order_index, req.params.identifier]
+    );
+    const updated = await db.getAsync('SELECT * FROM categories WHERE identifier = ?', [req.params.identifier]);
+    res.json(updated);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.delete('/categories/:identifier', auth, async (req, res) => {
+  try {
+    if (req.params.identifier === 'All') return res.status(400).json({ error: 'Không thể xóa danh mục Tất cả.' });
+    const existing = await db.getAsync('SELECT * FROM categories WHERE identifier = ?', [req.params.identifier]);
+    if (!existing) return res.status(404).json({ error: 'Category not found.' });
+    
+    await db.runAsync('DELETE FROM categories WHERE identifier = ?', [req.params.identifier]);
+    // Optionally: Update photos that had this category to 'Other' or null
+    await db.runAsync('UPDATE photos SET category = ? WHERE category = ?', ['Other', req.params.identifier]);
+    
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // ─── Services ─────────────────────────────────────────────────────────────────
 router.get('/services', auth, async (req, res) => {
   try {

@@ -45,8 +45,7 @@ router.get('/photos', async (req, res) => {
 router.get('/categories', async (req, res) => {
   try {
     const rows = await db.allAsync('SELECT identifier, display_name FROM categories WHERE visible = 1 ORDER BY order_index ASC');
-    // Prepend 'All' automatically
-    res.json([{ identifier: 'All', display_name: 'Tất Cả' }, ...rows]);
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

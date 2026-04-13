@@ -186,7 +186,23 @@ async function loadGallery() {
       btnLoadMore.dataset.bound = 'true';
     }
 
-    applyFilter('All');
+    const urlParams = new URLSearchParams(window.location.search);
+    let defaultCat = urlParams.get('category') || 'All';
+    
+    // Validate if the requested category actually exists (in case user types a wrong URL)
+    if (!cats.find(c => c.identifier === defaultCat)) {
+      defaultCat = 'All';
+    }
+
+    applyFilter(defaultCat);
+    
+    // Auto scroll to gallery natively if coming from a shared link
+    if (urlParams.has('category')) {
+      setTimeout(() => {
+        const gallerySection = $('#gallery');
+        if (gallerySection) gallerySection.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
   } catch (err) {
     grid.innerHTML = `<div class="gallery-empty"><div class="gallery-empty-icon">📷</div><p>Không thể tải ảnh.</p></div>`;
     console.warn(err);
@@ -196,15 +212,23 @@ async function loadGallery() {
 function initFilterBar() {
   $$('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      $$('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
       applyFilter(btn.dataset.filter);
     });
   });
 }
 
 function applyFilter(category) {
+  // Update buttons state
+  $$('.filter-btn').forEach(b => { 
+    if (b.dataset.filter === category) {
+      b.classList.add('active');
+      b.setAttribute('aria-selected', 'true');
+    } else {
+      b.classList.remove('active'); 
+      b.setAttribute('aria-selected', 'false');
+    }
+  });
+
   activeFilter = category;
   filteredPhotos = category === 'All' ? allPhotos : allPhotos.filter(p => p.category === category);
   currentGalleryPage = 1;
